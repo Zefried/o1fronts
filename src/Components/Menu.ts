@@ -9,6 +9,11 @@ import {
   Building,
   Layers,
   BarChart3,
+  Tag,
+  List,
+  Plus,
+  MessageSquare,
+  Bot,
 } from "lucide-react";
 
 export type Role = "admin" | "subadmin" | "department";
@@ -33,6 +38,11 @@ export const menus: Record<Role, MenuItem[]> = {
     },
 
     {
+      name: "Playground",
+      icon: Bot,
+      path: "/dashboard/playground",
+    },
+    {
       name: "Masters",
       icon: Building,
       children: [
@@ -44,6 +54,100 @@ export const menus: Record<Role, MenuItem[]> = {
       ],
     },
 
+    {
+      name: "Category",
+      icon: Tag,
+      children: [
+        {
+          name: "View Categories",
+          icon: List,
+          path: "/dashboard/category",
+        },
+        {
+          name: "Add Category",
+          icon: Plus,
+          path: "/dashboard/category/add",
+        },
+      ],
+    },
+
+    {
+      name: "Services",
+      icon: ShoppingCart,
+      children: [
+        {
+          name: "View Services",
+          icon: List,
+          path: "/dashboard/service",
+        },
+        {
+          name: "Add Service",
+          icon: Plus,
+          path: "/dashboard/service/add",
+        },
+      ],
+    },
+
+    {
+      name: "Attributes",
+      icon: BarChart3,
+      children: [
+        {
+          name: "View Attributes",
+          icon: List,
+          path: "/dashboard/attributes",
+        },
+        {
+          name: "Add Attribute",
+          icon: Plus,
+          path: "/dashboard/attributes/add",
+        },
+        {
+          name: "View Fields",
+          icon: List,
+          path: "/dashboard/attribute-fields",
+        },
+        {
+          name: "Add Field",
+          icon: Plus,
+          path: "/dashboard/attribute-fields/add",
+        },
+      ],
+    },
+
+    {
+      name: "AI Contexts",
+      icon: MessageSquare,
+      children: [
+        {
+          name: "View Contexts",
+          icon: List,
+          path: "/dashboard/ai-contexts",
+        },
+        {
+          name: "Add Context",
+          icon: Plus,
+          path: "/dashboard/ai-contexts/add",
+        },
+      ],
+    },
+
+    {
+      name: "Businesses",
+      icon: Building,
+      children: [
+        {
+          name: "View Businesses",
+          icon: List,
+          path: "/dashboard/businesses",
+        },
+        {
+          name: "Add Business",
+          icon: Plus,
+          path: "/dashboard/businesses/add",
+        },
+      ],
+    },
   ],
 
   subadmin: [
