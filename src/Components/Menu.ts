@@ -40,7 +40,18 @@ export const menus: Record<Role, MenuItem[]> = {
     {
       name: "Playground",
       icon: Bot,
-      path: "/dashboard/playground",
+      children: [
+        {
+          name: "Chat",
+          icon: MessageSquare,
+          path: "/dashboard/playground",
+        },
+        {
+          name: "Create Campaign",
+          icon: Plus,
+          path: "/dashboard/playground/create-campaign",
+        }
+      ]
     },
     {
       name: "Masters",

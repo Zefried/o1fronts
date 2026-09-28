@@ -1,0 +1,83 @@
+.public-chat-sidebar {
+  width: 280px;
+  background-color: #0a0a0a;
+  border-right: 1px solid #1f1f1f;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 20px;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  padding: 0 4px;
+}
+
+.sidebar-menu-icon {
+  color: #888;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.sidebar-menu-icon:hover {
+  color: #fff;
+}
+
+.sidebar-logo {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  letter-spacing: -0.5px;
+}
+.sidebar-logo span {
+  color: #f02d3a;
+}
+
+.new-chat-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  color: #eee;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 24px;
+  transition: all 0.2s ease;
+}
+
+.new-chat-btn:hover {
+  background-color: #242424;
+  border-color: #333;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #888;
+  text-decoration: none;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.nav-item:hover, .nav-item.active {
+  background-color: #161616;
+  color: #eee;
+}

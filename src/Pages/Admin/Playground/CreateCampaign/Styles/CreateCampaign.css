@@ -1,0 +1,98 @@
+.create-campaign-container {
+  padding: 24px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin: 16px;
+}
+
+.campaign-header h2 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.campaign-header p {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.campaign-body {
+  padding: 24px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.input-group {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.input-group input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.input-group button {
+  padding: 10px 20px;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.input-group button:disabled {
+  background-color: #ccc;
+}
+
+.error-text {
+  color: #d9534f;
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+.success-text {
+  color: #5cb85c;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.result-container {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #ddd;
+}
+
+.link-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.link-box a {
+  flex: 1;
+  color: #007bff;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.link-box button {
+  padding: 6px 12px;
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}

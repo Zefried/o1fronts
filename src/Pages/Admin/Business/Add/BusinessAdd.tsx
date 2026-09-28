@@ -22,6 +22,7 @@ export const BusinessAdd = () => {
     bio: "",
     password: "",
     category_id: "",
+    role: "business",
   });
 
   const [categories, setCategories] = useState<FlatCategory[]>([]);
@@ -51,7 +52,7 @@ export const BusinessAdd = () => {
   };
 
   const handleReset = () => {
-    setFormData({ name: "", email: "", phone: "", bio: "", password: "", category_id: "" });
+    setFormData({ name: "", email: "", phone: "", bio: "", password: "", category_id: "", role: "business" });
     setError("");
     setSuccess("");
   };
@@ -66,7 +67,7 @@ export const BusinessAdd = () => {
       const res = await api.post("/admin/businesses", formData);
 
       if (res.data.status) {
-        setFormData({ name: "", email: "", phone: "", bio: "", password: "", category_id: "" });
+        setFormData({ name: "", email: "", phone: "", bio: "", password: "", category_id: "", role: "business" });
         setSuccess("✅ Business account created successfully!");
         setTimeout(() => setSuccess(""), 4000);
       } else {
@@ -193,6 +194,26 @@ export const BusinessAdd = () => {
                   {cat.label}
                 </option>
               ))}
+            </select>
+          </div>
+
+          {/* Role */}
+          <div className="biz-add__group">
+            <label className="biz-add__label" htmlFor="biz-role">
+              Account Role <span className="biz-add__required">*</span>
+            </label>
+            <select
+              id="biz-role"
+              name="role"
+              className="biz-add__input"
+              value={formData.role}
+              onChange={handleChange as any}
+              required
+            >
+              <option value="business">Business</option>
+              <option value="vendor">Vendor</option>
+              <option value="admin">Admin</option>
+              <option value="subadmin">Sub-Admin</option>
             </select>
           </div>
 
