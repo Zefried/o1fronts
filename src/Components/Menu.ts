@@ -50,6 +50,11 @@ export const menus: Record<Role, MenuItem[]> = {
           name: "Create Campaign",
           icon: Plus,
           path: "/dashboard/playground/create-campaign",
+        },
+        {
+          name: "View Campaigns",
+          icon: List,
+          path: "/dashboard/playground/view-campaigns",
         }
       ]
     },

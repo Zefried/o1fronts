@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import api from '../../../../api/axios';
 import './Styles/CreateCampaign.css';
 
 export const CreateCampaign = () => {
@@ -7,6 +8,12 @@ export const CreateCampaign = () => {
   const [error, setError] = useState('');
   const [campaignLink, setCampaignLink] = useState('');
   const [businessName, setBusinessName] = useState('');
+
+  // New form fields
+  const [campaignName, setCampaignName] = useState('');
+  const [gender, setGender] = useState('both');
+  const [locations, setLocations] = useState('');
+  const [isSaved, setIsSaved] = useState(false);
 
   const handleCheckAndGenerate = async () => {
     if (!businessId.trim()) {
@@ -18,20 +25,17 @@ export const CreateCampaign = () => {
     setError('');
     setCampaignLink('');
     setBusinessName('');
+    setIsSaved(false); // Reset on new generate
+    setCampaignName('');
+    setGender('both');
+    setLocations('');
 
     try {
-      const token = localStorage.getItem('token');
-      // Using full URL for local dev, ensure the port matches your backend.
-      const res = await fetch(`http://localhost:8000/api/admin/businesses/check`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ business_id: businessId.trim() })
+      const res = await api.post('/admin/businesses/check', {
+        business_id: businessId.trim()
       });
 
-      const data = await res.json();
+      const data = res.data;
 
       if (data.status) {
         setBusinessName(data.data.name);
@@ -51,18 +55,73 @@ export const CreateCampaign = () => {
     }
   };
 
+  const handleSaveCampaign = async () => {
+    if (!campaignName.trim()) {
+      alert("Please enter a campaign name.");
+      return;
+    }
+    if (!locations.trim()) {
+      alert("Please enter target locations.");
+      return;
+    }
+    
+    try {
+      const res = await api.post('/admin/campaigns', {
+        business_id: businessId.trim(),
+        campaign_name: campaignName.trim(),
+        gender: gender,
+        locations: locations.trim(),
+        campaign_link: campaignLink
+      });
+
+      if (res.data.status) {
+        setIsSaved(true);
+        alert("Campaign details saved! You can now open the link.");
+      } else {
+        alert(res.data.message || "Failed to save campaign.");
+      }
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message?: string } } };
+      alert(e?.response?.data?.message || "Something went wrong while saving the campaign.");
+    }
+  };
+
+  const handleLinkClick = (e: React.MouseEvent) => {
+    if (!isSaved) {
+      e.preventDefault();
+      alert("Please enter and submit the campaign information first!");
+    }
+  };
+
+  const handleOpenChat = () => {
+    if (!isSaved) {
+      alert("Please enter and submit the campaign information first!");
+      return;
+    }
+    window.open(campaignLink, '_blank');
+  };
+
+  const handleCopyLink = () => {
+    if (!isSaved) {
+      alert("Please enter and submit the campaign information first!");
+      return;
+    }
+    navigator.clipboard.writeText(campaignLink);
+    alert("Link copied!");
+  };
+
   return (
     <div className="create-campaign-container">
       <div className="campaign-header">
         <h2>Create Chat Campaign</h2>
         <p>Generate a unique chat link for your clients to start a conversation.</p>
       </div>
-      
+
       <div className="campaign-body">
         <div className="input-group">
-          <input 
-            type="text" 
-            placeholder="e.g. BUS-CAYSSPVW" 
+          <input
+            type="text"
+            placeholder="e.g. BUS-CAYSSPVW"
             value={businessId}
             onChange={(e) => setBusinessId(e.target.value)}
           />
@@ -76,10 +135,56 @@ export const CreateCampaign = () => {
         {campaignLink && (
           <div className="result-container">
             <p className="success-text">Business Found: {businessName}</p>
-            <div className="link-box">
-              <a href={campaignLink} target="_blank" rel="noreferrer">{campaignLink}</a>
-              <button onClick={() => window.open(campaignLink, '_blank')}>Open Chat</button>
-              <button onClick={() => navigator.clipboard.writeText(campaignLink)}>Copy</button>
+
+            <div className="campaign-form-section">
+              <h3>Campaign Details</h3>
+
+              <div className="form-group">
+                <label>Campaign Name <span style={{ color: '#d9534f' }}>*</span></label>
+                <input
+                  type="text"
+                  value={campaignName}
+                  onChange={(e) => setCampaignName(e.target.value)}
+                  placeholder="e.g. Solar 2026 april leads"
+                  disabled={isSaved}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Target Gender</label>
+                <select value={gender} onChange={(e) => setGender(e.target.value)} disabled={isSaved}>
+                  <option value="both">Both (Male &amp; Female)</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Target Locations (e.g. Jorhat, All Assam)</label>
+                <textarea
+                  value={locations}
+                  onChange={(e) => setLocations(e.target.value)}
+                  placeholder="Enter locations separated by commas..."
+                  disabled={isSaved}
+                  rows={3}
+                />
+              </div>
+
+              <button 
+                className={`save-campaign-btn ${isSaved ? 'btn-disabled' : ''}`} 
+                onClick={handleSaveCampaign}
+                disabled={isSaved}
+              >
+                {isSaved ? "Campaign Saved" : "Save Campaign Details"}
+              </button>
+            </div>
+
+            <div className={`link-box ${!isSaved ? 'disabled-link-box' : ''}`}>
+              <a href={campaignLink} target="_blank" rel="noreferrer" onClick={handleLinkClick}>
+                {campaignLink}
+              </a>
+              <button onClick={handleOpenChat} className={!isSaved ? "btn-disabled" : ""}>Open Chat</button>
+              <button onClick={handleCopyLink} className={!isSaved ? "btn-disabled" : ""}>Copy</button>
             </div>
           </div>
         )}
