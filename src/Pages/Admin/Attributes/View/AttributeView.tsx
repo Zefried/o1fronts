@@ -152,6 +152,64 @@ const DeleteModal = ({
   );
 };
 
+// ─── Bulk Delete Modal ────────────────────────────────────────────────────────
+
+const BulkDeleteModal = ({ ids, onClose, onDeleted, addToast }: { ids: number[], onClose: () => void, onDeleted: () => void, addToast: (type: Toast["type"], msg: string) => void }) => {
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      const res = await api.delete(`/admin/attributes/bulk`, { data: { ids } });
+      if (res.data.status) {
+        addToast("success", `🗑️ ${res.data.message || "Attributes deleted successfully!"}`);
+        onDeleted();
+        onClose();
+      } else {
+        addToast("error", res.data.message || "Bulk delete failed.");
+        onClose();
+      }
+    } catch {
+      addToast("error", "Something went wrong.");
+      onClose();
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <div className="av-modal-overlay" onClick={onClose}>
+      <div className="av-modal av-modal--danger" onClick={(e) => e.stopPropagation()}>
+        <div className="av-modal__header">
+          <h2 className="av-modal__title">Bulk Delete Attributes</h2>
+          <button className="av-modal__close" onClick={onClose}>✕</button>
+        </div>
+        <div className="av-modal__body">
+          <div className="av-delete-icon">🗑️</div>
+          <p className="av-delete-msg">
+            Are you sure you want to delete <strong>{ids.length}</strong> selected attributes?
+          </p>
+          <p className="av-delete-warn">
+            ⚠️ This action cannot be undone. All associated fields will also be deleted.
+          </p>
+        </div>
+        <div className="av-modal__footer">
+          <button
+            className="av-btn av-btn--danger"
+            onClick={handleDelete}
+            disabled={deleting}
+          >
+            {deleting ? "Deleting…" : "Yes, Delete All"}
+          </button>
+          <button className="av-btn av-btn--ghost" onClick={onClose} disabled={deleting}>
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export const AttributeView = () => {
@@ -161,6 +219,8 @@ export const AttributeView = () => {
   const [togglingId, setTogglingId] = useState<number | null>(null);
   const [search, setSearch] = useState("");
   const [filterCat, setFilterCat] = useState<string>("");
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [showBulkDelete, setShowBulkDelete] = useState(false);
 
   const [editTarget, setEditTarget] = useState<Attribute | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Attribute | null>(null);
@@ -177,7 +237,7 @@ export const AttributeView = () => {
       if (attrRes.data.status) setAttributes(attrRes.data.data);
       if (catRes.data.status) setCategories(catRes.data.data);
     } catch { addToast("error", "Failed to load attributes."); }
-    finally { setLoading(false); }
+    finally { setLoading(false); setSelectedIds([]); }
   }, [addToast]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
@@ -208,6 +268,20 @@ export const AttributeView = () => {
   const activeCount = attributes.filter((a) => a.status === "active").length;
   const globalCount = attributes.filter((a) => a.category_id === null).length;
 
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedIds(filtered.map((a) => a.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectOne = (id: number) => {
+    setSelectedIds((prev) => 
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
+  };
+
   return (
     <div className="av">
       {/* Toasts */}
@@ -235,15 +309,24 @@ export const AttributeView = () => {
       </div>
 
       {/* Filters */}
-      <div className="av-filters">
+      <div className="av-filters" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
         <input id="attr-search" className="av-search" type="text" placeholder="Search by name or category…"
-          value={search} onChange={(e) => setSearch(e.target.value)} />
+          value={search} onChange={(e) => setSearch(e.target.value)} style={{ flex: 1 }} />
         <select id="attr-filter-cat" className="av-filter-select" value={filterCat}
-          onChange={(e) => setFilterCat(e.target.value)}>
+          onChange={(e) => setFilterCat(e.target.value)} style={{ width: '220px' }}>
           <option value="">All categories</option>
           <option value="global">Global only</option>
           {categories.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
         </select>
+        
+        {selectedIds.length > 0 && (
+          <button 
+            className="av-btn av-btn--danger"
+            onClick={() => setShowBulkDelete(true)}
+          >
+            Bulk Delete ({selectedIds.length})
+          </button>
+        )}
       </div>
 
       {/* Table */}
@@ -263,6 +346,13 @@ export const AttributeView = () => {
             <table className="av-table">
               <thead>
                 <tr>
+                  <th className="av-th" style={{ width: '40px' }}>
+                    <input 
+                      type="checkbox" 
+                      checked={filtered.length > 0 && selectedIds.length === filtered.length}
+                      onChange={handleSelectAll}
+                    />
+                  </th>
                   <th className="av-th">Name</th>
                   <th className="av-th">Category</th>
                   <th className="av-th">Description</th>
@@ -273,6 +363,13 @@ export const AttributeView = () => {
               <tbody>
                 {filtered.map((attr) => (
                   <tr key={attr.id} className="av-row">
+                    <td className="av-td">
+                      <input 
+                        type="checkbox"
+                        checked={selectedIds.includes(attr.id)}
+                        onChange={() => handleSelectOne(attr.id)}
+                      />
+                    </td>
                     <td className="av-td av-td--name">
                       <span className="av-name">{attr.name}</span>
                       <code className="av-slug">{attr.slug}</code>
@@ -320,6 +417,16 @@ export const AttributeView = () => {
       {deleteTarget && (
         <DeleteModal attr={deleteTarget}
           onClose={() => setDeleteTarget(null)} onDeleted={fetchData} addToast={addToast} />
+      )}
+      
+      {/* Bulk Delete Modal */}
+      {showBulkDelete && (
+        <BulkDeleteModal
+          ids={selectedIds}
+          onClose={() => setShowBulkDelete(false)}
+          onDeleted={fetchData}
+          addToast={addToast}
+        />
       )}
     </div>
   );

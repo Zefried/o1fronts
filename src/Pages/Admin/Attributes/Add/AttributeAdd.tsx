@@ -19,6 +19,7 @@ export const AttributeAdd = () => {
   const [name, setName] = useState("");
   const [bulkAttributes, setBulkAttributes] = useState("");
   const [categoryId, setCategoryId] = useState<string>("");
+  const [businessId, setBusinessId] = useState<string>("");
   const [description, setDescription] = useState("");
 
   const [categories, setCategories] = useState<FlatCategory[]>([]);
@@ -37,7 +38,7 @@ export const AttributeAdd = () => {
 
   const handleReset = () => {
     setMode("single");
-    setName(""); setCategoryId(""); setDescription(""); setBulkAttributes("");
+    setName(""); setCategoryId(""); setBusinessId(""); setDescription(""); setBulkAttributes("");
     setError(""); setSuccess("");
   };
 
@@ -50,12 +51,15 @@ export const AttributeAdd = () => {
       if (!categoryId) { setError("Category selection is required for bulk upload."); return; }
     }
 
+    if (!businessId.trim()) { setError("Business ID is required."); return; }
+
     setLoading(true); setError(""); setSuccess("");
     try {
       let res;
       if (mode === "single") {
-        const payload: { name: string; category_id?: number; description?: string } = {
+        const payload: { name: string; category_id?: number; business_id: string; description?: string } = {
           name: name.trim(),
+          business_id: businessId.trim(),
         };
         if (categoryId) payload.category_id = Number(categoryId);
         if (description.trim()) payload.description = description.trim();
@@ -65,11 +69,12 @@ export const AttributeAdd = () => {
         res = await api.post("/admin/attributes/bulk", {
           attributes: bulkAttributes.trim(),
           category_id: Number(categoryId),
+          business_id: businessId.trim(),
         });
       }
 
       if (res.data.status) {
-        setName(""); setCategoryId(""); setDescription(""); setBulkAttributes(""); setError("");
+        setName(""); setCategoryId(""); setBusinessId(""); setDescription(""); setBulkAttributes(""); setError("");
         setSuccess(res.data.message || "✅ Attribute(s) created successfully!");
         setTimeout(() => setSuccess(""), 4000);
       } else {
@@ -150,6 +155,21 @@ export const AttributeAdd = () => {
               </div>
             </>
           )}
+
+          {/* Business ID */}
+          <div className="aa__group">
+            <label className="aa__label" htmlFor="attr-businessId">
+              Business ID <span className="aa__required">*</span>
+            </label>
+            <input
+              id="attr-businessId"
+              type="text"
+              className="aa__input"
+              value={businessId}
+              onChange={(e) => setBusinessId(e.target.value)}
+              placeholder="e.g. BUS-QVTE1BKU"
+            />
+          </div>
 
           {/* Category */}
           <div className="aa__group">

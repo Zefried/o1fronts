@@ -216,6 +216,63 @@ const DeleteModal = ({ service, onClose, onDeleted, addToast }: DeleteModalProps
   );
 };
 
+// ─── Bulk Delete Modal ────────────────────────────────────────────────────────
+const BulkDeleteModal = ({ ids, onClose, onDeleted, addToast }: { ids: number[], onClose: () => void, onDeleted: () => void, addToast: (type: Toast["type"], msg: string) => void }) => {
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      const res = await api.delete(`/admin/services/bulk`, { data: { ids } });
+      if (res.data.status) {
+        addToast("success", `🗑️ ${res.data.message || "Services deleted successfully!"}`);
+        onDeleted();
+        onClose();
+      } else {
+        addToast("error", res.data.message || "Bulk delete failed.");
+        onClose();
+      }
+    } catch {
+      addToast("error", "Something went wrong.");
+      onClose();
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <div className="sv-modal-overlay" onClick={onClose}>
+      <div className="sv-modal sv-modal--danger" onClick={(e) => e.stopPropagation()}>
+        <div className="sv-modal__header">
+          <h2 className="sv-modal__title">Bulk Delete Services</h2>
+          <button className="sv-modal__close" onClick={onClose}>✕</button>
+        </div>
+        <div className="sv-modal__body">
+          <div className="sv-delete-icon">🗑️</div>
+          <p className="sv-delete-msg">
+            Are you sure you want to delete <strong>{ids.length}</strong> selected services?
+          </p>
+          <p className="sv-delete-warn">
+            ⚠️ This action cannot be undone. All associated attribute data will also be deleted.
+          </p>
+        </div>
+        <div className="sv-modal__footer">
+          <button
+            className="sv-btn sv-btn--danger"
+            onClick={handleDelete}
+            disabled={deleting}
+          >
+            {deleting ? "Deleting…" : "Yes, Delete All"}
+          </button>
+          <button className="sv-btn sv-btn--ghost" onClick={onClose} disabled={deleting}>
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export const ServiceView = () => {
@@ -224,6 +281,9 @@ export const ServiceView = () => {
   const [loading, setLoading] = useState(true);
   const [togglingId, setTogglingId] = useState<number | null>(null);
   const [search, setSearch] = useState("");
+  const [filterCat, setFilterCat] = useState<string>("");
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [showBulkDelete, setShowBulkDelete] = useState(false);
 
   const [editTarget, setEditTarget] = useState<Service | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Service | null>(null);
@@ -243,6 +303,7 @@ export const ServiceView = () => {
       addToast("error", "Failed to load services.");
     } finally {
       setLoading(false);
+      setSelectedIds([]); // Clear selection on reload
     }
   }, [addToast]);
 
@@ -268,12 +329,28 @@ export const ServiceView = () => {
     }
   };
 
-  const filtered = services.filter((s) =>
-    s.name.toLowerCase().includes(search.toLowerCase()) ||
-    (s.category?.name ?? "").toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = services.filter((s) => {
+    const matchSearch = s.name.toLowerCase().includes(search.toLowerCase()) ||
+                        (s.category?.name ?? "").toLowerCase().includes(search.toLowerCase());
+    const matchCat = filterCat ? s.category_id === Number(filterCat) : true;
+    return matchSearch && matchCat;
+  });
 
   const activeCount = services.filter((s) => s.status === "active").length;
+
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedIds(filtered.map((s) => s.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectOne = (id: number) => {
+    setSelectedIds((prev) => 
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
+  };
 
   return (
     <div className="sv">
@@ -311,8 +388,8 @@ export const ServiceView = () => {
         </div>
       </div>
 
-      {/* Search */}
-      <div className="sv-search-wrap">
+      {/* Search & Filters */}
+      <div className="sv-search-wrap" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
         <input
           id="svc-search"
           type="text"
@@ -320,7 +397,28 @@ export const ServiceView = () => {
           placeholder="Search by name or category…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          style={{ flex: 1 }}
         />
+        <select
+          className="sv-search"
+          value={filterCat}
+          onChange={(e) => setFilterCat(e.target.value)}
+          style={{ width: '220px' }}
+        >
+          <option value="">All Categories</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>{c.label}</option>
+          ))}
+        </select>
+
+        {selectedIds.length > 0 && (
+          <button 
+            className="sv-btn sv-btn--danger"
+            onClick={() => setShowBulkDelete(true)}
+          >
+            Bulk Delete ({selectedIds.length})
+          </button>
+        )}
       </div>
 
       {/* Table */}
@@ -347,6 +445,13 @@ export const ServiceView = () => {
             <table className="sv-table">
               <thead>
                 <tr>
+                  <th className="sv-th" style={{ width: '40px' }}>
+                    <input 
+                      type="checkbox" 
+                      checked={filtered.length > 0 && selectedIds.length === filtered.length}
+                      onChange={handleSelectAll}
+                    />
+                  </th>
                   <th className="sv-th">Name</th>
                   <th className="sv-th">Category</th>
                   <th className="sv-th">Description</th>
@@ -357,6 +462,13 @@ export const ServiceView = () => {
               <tbody>
                 {filtered.map((svc) => (
                   <tr key={svc.id} className="sv-row">
+                    <td className="sv-td">
+                      <input 
+                        type="checkbox"
+                        checked={selectedIds.includes(svc.id)}
+                        onChange={() => handleSelectOne(svc.id)}
+                      />
+                    </td>
                     <td className="sv-td sv-td--name">
                       <span className="sv-name">{svc.name}</span>
                       <code className="sv-slug">{svc.slug}</code>
@@ -440,6 +552,16 @@ export const ServiceView = () => {
         <DeleteModal
           service={deleteTarget}
           onClose={() => setDeleteTarget(null)}
+          onDeleted={fetchData}
+          addToast={addToast}
+        />
+      )}
+
+      {/* Bulk Delete Modal */}
+      {showBulkDelete && (
+        <BulkDeleteModal
+          ids={selectedIds}
+          onClose={() => setShowBulkDelete(false)}
           onDeleted={fetchData}
           addToast={addToast}
         />

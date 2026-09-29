@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { Send } from "lucide-react";
 import { PublicChatSidebar } from "./Layout/Sidebar/PublicChatSidebar";
+import api from "../../api/axios";
 import "./Styles/PublicChat.css";
 
 interface ChatMessage {
@@ -22,7 +23,7 @@ function generateId(): string {
 const WELCOME_MESSAGE: ChatMessage = {
   id: "welcome",
   role: "assistant",
-  content: "Sure! I can help you find the best services. Let me know what you are looking for.",
+  content: "",
   timestamp: new Date(),
 };
 
@@ -81,6 +82,40 @@ export const PublicChat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typingStatus]);
 
+  // Initial request when component mounts and businessId is ready
+  useEffect(() => {
+    if (businessId) {
+      const fetchInitialGreeting = async () => {
+        setTypingStatus('just_a_sec...');
+        try {
+          const res = await api.post('/public/chat', {
+            // We send an initial trigger message so the AI can greet us
+            message: "Hello",
+            chat: [],
+            business_id: businessId
+          });
+
+          if (res.data.status && res.data.data?.reply) {
+            setMessages([
+              {
+                id: generateId(),
+                role: "assistant",
+                content: res.data.data.reply,
+                timestamp: new Date(),
+              }
+            ]);
+          }
+        } catch (err) {
+          console.error("Failed to fetch initial greeting", err);
+        } finally {
+          setTypingStatus('none');
+        }
+      };
+
+      fetchInitialGreeting();
+    }
+  }, [businessId]);
+
   const handleClearChat = () => {
     setMessages([
       {
@@ -113,16 +148,12 @@ export const PublicChat = () => {
     }, 2000);
 
     try {
-      const res = await fetch(`http://localhost:8000/api/public/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: text,
-          chat: messages.map(m => ({ role: m.role, content: m.content })),
-          business_id: businessId
-        }),
+      const res = await api.post('/public/chat', {
+        message: text,
+        chat: messages.map(m => ({ role: m.role, content: m.content })),
+        business_id: businessId
       });
-      const data = await res.json();
+      const data = res.data;
 
       let replyContent = "Sorry, I am unable to fulfill that request right now.";
       if (data.status && data.data?.reply) {

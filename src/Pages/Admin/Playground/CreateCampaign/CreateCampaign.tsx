@@ -9,10 +9,11 @@ export const CreateCampaign = () => {
   const [campaignLink, setCampaignLink] = useState('');
   const [businessName, setBusinessName] = useState('');
 
-  // New form fields
   const [campaignName, setCampaignName] = useState('');
   const [gender, setGender] = useState('both');
   const [locations, setLocations] = useState('');
+  const [targetServiceId, setTargetServiceId] = useState('');
+  const [services, setServices] = useState<{id: number, name: string}[]>([]);
   const [isSaved, setIsSaved] = useState(false);
 
   const handleCheckAndGenerate = async () => {
@@ -29,6 +30,8 @@ export const CreateCampaign = () => {
     setCampaignName('');
     setGender('both');
     setLocations('');
+    setTargetServiceId('');
+    setServices([]);
 
     try {
       const res = await api.post('/admin/businesses/check', {
@@ -39,6 +42,17 @@ export const CreateCampaign = () => {
 
       if (data.status) {
         setBusinessName(data.data.name);
+        
+        // Fetch services for this business
+        try {
+          const svcRes = await api.get(`/admin/services?business_id=${businessId.trim()}`);
+          if (svcRes.data.status) {
+            setServices(svcRes.data.data.filter((s: any) => s.status === 'active'));
+          }
+        } catch (e) {
+          console.error("Failed to load services");
+        }
+
         // Add random padding to make it longer, then base64 encode it
         const randomString = Math.random().toString(36).substring(2, 15);
         const encodedToken = btoa(`${businessId.trim()}||${randomString}`);
@@ -66,13 +80,19 @@ export const CreateCampaign = () => {
     }
     
     try {
-      const res = await api.post('/admin/campaigns', {
+      const payload: any = {
         business_id: businessId.trim(),
         campaign_name: campaignName.trim(),
         gender: gender,
         locations: locations.trim(),
         campaign_link: campaignLink
-      });
+      };
+      
+      if (targetServiceId) {
+        payload.service_id = targetServiceId;
+      }
+
+      const res = await api.post('/admin/campaigns', payload);
 
       if (res.data.status) {
         setIsSaved(true);
@@ -156,6 +176,16 @@ export const CreateCampaign = () => {
                   <option value="both">Both (Male &amp; Female)</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Target Service (Optional)</label>
+                <select value={targetServiceId} onChange={(e) => setTargetServiceId(e.target.value)} disabled={isSaved}>
+                  <option value="">-- No Specific Service --</option>
+                  {services.map(svc => (
+                    <option key={svc.id} value={svc.id}>{svc.name}</option>
+                  ))}
                 </select>
               </div>
 

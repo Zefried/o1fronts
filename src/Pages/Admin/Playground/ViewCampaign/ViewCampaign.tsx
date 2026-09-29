@@ -9,6 +9,11 @@ interface Campaign {
   gender: string;
   locations: string;
   campaign_link: string;
+  service_id?: number | null;
+  service?: {
+    id: number;
+    name: string;
+  };
   created_at: string;
 }
 
@@ -117,6 +122,7 @@ export const ViewCampaign = () => {
                 <th>Campaign Name</th>
                 <th>Target Gender</th>
                 <th>Target Locations</th>
+                <th>Target Service</th>
                 <th>Link</th>
                 <th>Created At</th>
                 <th>Action</th>
@@ -130,6 +136,7 @@ export const ViewCampaign = () => {
                   <td>{campaign.campaign_name}</td>
                   <td><span style={{ textTransform: 'capitalize' }}>{campaign.gender}</span></td>
                   <td>{campaign.locations}</td>
+                  <td>{campaign.service ? campaign.service.name : <span style={{ color: '#888' }}>-- None --</span>}</td>
                   <td>
                     <a href={campaign.campaign_link} target="_blank" rel="noreferrer" style={{ color: '#007bff' }}>
                       Open Link

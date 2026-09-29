@@ -19,6 +19,7 @@ export const ServiceAdd = () => {
   const [name, setName] = useState("");
   const [bulkServices, setBulkServices] = useState("");
   const [categoryId, setCategoryId] = useState<string>("");
+  const [businessId, setBusinessId] = useState<string>("");
   const [description, setDescription] = useState("");
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -47,6 +48,7 @@ export const ServiceAdd = () => {
     setName("");
     setBulkServices("");
     setCategoryId("");
+    setBusinessId("");
     setDescription("");
     setError("");
     setSuccess("");
@@ -71,6 +73,11 @@ export const ServiceAdd = () => {
       }
     }
 
+    if (!businessId.trim()) {
+      setError("Business ID is required.");
+      return;
+    }
+
     setLoading(true);
     setError("");
     setSuccess("");
@@ -78,8 +85,9 @@ export const ServiceAdd = () => {
     try {
       let res;
       if (mode === "single") {
-        const payload: { name: string; category_id?: number; description?: string } = {
+        const payload: { name: string; category_id?: number; business_id: string; description?: string } = {
           name: name.trim(),
+          business_id: businessId.trim(),
         };
         if (categoryId) payload.category_id = Number(categoryId);
         if (description.trim()) payload.description = description.trim();
@@ -89,6 +97,7 @@ export const ServiceAdd = () => {
         res = await api.post("/admin/services/bulk", {
           services: bulkServices.trim(),
           category_id: Number(categoryId),
+          business_id: businessId.trim(),
         });
       }
 
@@ -96,6 +105,7 @@ export const ServiceAdd = () => {
         setName("");
         setBulkServices("");
         setCategoryId("");
+        setBusinessId("");
         setDescription("");
         setError("");
         setSuccess(res.data.message || "✅ Service(s) created successfully!");
@@ -141,6 +151,21 @@ export const ServiceAdd = () => {
                 Bulk Upload
               </button>
             </div>
+          </div>
+
+          {/* Business ID */}
+          <div className="sa__group">
+            <label className="sa__label" htmlFor="svc-businessId">
+              Business ID <span className="sa__required">*</span>
+            </label>
+            <input
+              id="svc-businessId"
+              type="text"
+              className="sa__input"
+              value={businessId}
+              onChange={(e) => setBusinessId(e.target.value)}
+              placeholder="e.g. BUS-QVTE1BKU"
+            />
           </div>
 
           {/* Category */}
