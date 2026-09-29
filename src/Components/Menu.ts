@@ -58,17 +58,6 @@ export const menus: Record<Role, MenuItem[]> = {
         }
       ]
     },
-    {
-      name: "Masters",
-      icon: Building,
-      children: [
-        {
-          name: "Location",
-          icon: Layers,
-          path: "/dashboard/locations",
-        },
-      ],
-    },
 
     {
       name: "Category",

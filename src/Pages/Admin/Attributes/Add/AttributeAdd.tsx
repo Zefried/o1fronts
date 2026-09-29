@@ -15,7 +15,9 @@ interface ApiError {
 }
 
 export const AttributeAdd = () => {
+  const [mode, setMode] = useState<"single" | "bulk">("single");
   const [name, setName] = useState("");
+  const [bulkAttributes, setBulkAttributes] = useState("");
   const [categoryId, setCategoryId] = useState<string>("");
   const [description, setDescription] = useState("");
 
@@ -34,29 +36,44 @@ export const AttributeAdd = () => {
   }, []);
 
   const handleReset = () => {
-    setName(""); setCategoryId(""); setDescription("");
+    setMode("single");
+    setName(""); setCategoryId(""); setDescription(""); setBulkAttributes("");
     setError(""); setSuccess("");
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!name.trim()) { setError("Attribute name is required."); return; }
+    if (mode === "single") {
+      if (!name.trim()) { setError("Attribute name is required."); return; }
+    } else {
+      if (!bulkAttributes.trim()) { setError("Please provide at least one attribute."); return; }
+      if (!categoryId) { setError("Category selection is required for bulk upload."); return; }
+    }
 
     setLoading(true); setError(""); setSuccess("");
     try {
-      const payload: { name: string; category_id?: number; description?: string } = {
-        name: name.trim(),
-      };
-      if (categoryId) payload.category_id = Number(categoryId);
-      if (description.trim()) payload.description = description.trim();
+      let res;
+      if (mode === "single") {
+        const payload: { name: string; category_id?: number; description?: string } = {
+          name: name.trim(),
+        };
+        if (categoryId) payload.category_id = Number(categoryId);
+        if (description.trim()) payload.description = description.trim();
 
-      const res = await api.post("/admin/attributes", payload);
+        res = await api.post("/admin/attributes", payload);
+      } else {
+        res = await api.post("/admin/attributes/bulk", {
+          attributes: bulkAttributes.trim(),
+          category_id: Number(categoryId),
+        });
+      }
+
       if (res.data.status) {
-        setName(""); setCategoryId(""); setDescription(""); setError("");
-        setSuccess("✅ Attribute created successfully!");
+        setName(""); setCategoryId(""); setDescription(""); setBulkAttributes(""); setError("");
+        setSuccess(res.data.message || "✅ Attribute(s) created successfully!");
         setTimeout(() => setSuccess(""), 4000);
       } else {
-        setError(res.data.message || "Failed to create attribute.");
+        setError(res.data.message || "Failed to create attribute(s).");
       }
     } catch (err: unknown) {
       const e = err as ApiError;
@@ -77,25 +94,67 @@ export const AttributeAdd = () => {
 
       <div className="aa__card">
         <form onSubmit={handleSubmit} noValidate>
-          {/* Name */}
-          <div className="aa__group">
-            <label className="aa__label" htmlFor="attr-name">
-              Attribute Name <span className="aa__required">*</span>
-            </label>
-            <input
-              id="attr-name"
-              type="text"
-              className="aa__input"
-              placeholder="e.g. Price, Warranty, Payment Process"
-              value={name}
-              onChange={(e) => { setName(e.target.value); setError(""); }}
-            />
+          {/* Mode Toggle */}
+          <div className="aa__group" style={{ marginBottom: '1.5rem' }}>
+            <span className="aa__label">Mode:</span>
+            <div className="aa__mode-toggle">
+              <button
+                type="button"
+                className={`aa__mode-btn ${mode === "single" ? "aa__mode-btn--active" : ""}`}
+                onClick={() => { setMode("single"); setError(""); }}
+              >
+                Single Attribute
+              </button>
+              <button
+                type="button"
+                className={`aa__mode-btn ${mode === "bulk" ? "aa__mode-btn--active" : ""}`}
+                onClick={() => { setMode("bulk"); setError(""); }}
+              >
+                Bulk Upload
+              </button>
+            </div>
           </div>
+
+          {mode === "single" ? (
+            <>
+              {/* Name */}
+              <div className="aa__group">
+                <label className="aa__label" htmlFor="attr-name">
+                  Attribute Name <span className="aa__required">*</span>
+                </label>
+                <input
+                  id="attr-name"
+                  type="text"
+                  className="aa__input"
+                  placeholder="e.g. Price, Warranty, Payment Process"
+                  value={name}
+                  onChange={(e) => { setName(e.target.value); setError(""); }}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Bulk Attributes Input */}
+              <div className="aa__group">
+                <label className="aa__label" htmlFor="attr-bulk">
+                  Attributes (Comma or new-line separated) <span className="aa__required">*</span>
+                </label>
+                <textarea
+                  id="attr-bulk"
+                  className="aa__textarea"
+                  placeholder="Price, Warranty&#10;Color"
+                  rows={6}
+                  value={bulkAttributes}
+                  onChange={(e) => { setBulkAttributes(e.target.value); setError(""); }}
+                />
+              </div>
+            </>
+          )}
 
           {/* Category */}
           <div className="aa__group">
             <label className="aa__label" htmlFor="attr-category">
-              Category
+              Category {mode === "bulk" && <span className="aa__required">*</span>}
             </label>
             <select
               id="attr-category"
@@ -110,24 +169,28 @@ export const AttributeAdd = () => {
               ))}
             </select>
             <span className="aa__hint">
-              Leave blank to make this attribute available globally.
+              {mode === "bulk"
+                ? "Required — all bulk attributes will be grouped under this category."
+                : "Leave blank to make this attribute available globally."}
             </span>
           </div>
 
           {/* Description */}
-          <div className="aa__group">
-            <label className="aa__label" htmlFor="attr-desc">
-              Description
-            </label>
-            <textarea
-              id="attr-desc"
-              className="aa__textarea"
-              placeholder="What does this attribute capture?"
-              rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
+          {mode === "single" && (
+            <div className="aa__group">
+              <label className="aa__label" htmlFor="attr-desc">
+                Description
+              </label>
+              <textarea
+                id="attr-desc"
+                className="aa__textarea"
+                placeholder="What does this attribute capture?"
+                rows={3}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
+          )}
 
           {error   && <p className="aa__error">{error}</p>}
           {success && <p className="aa__success aa__success--anim">{success}</p>}
