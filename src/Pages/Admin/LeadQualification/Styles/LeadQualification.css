@@ -1,0 +1,451 @@
+/* ==============================
+   LEAD QUALIFICATION PAGE
+============================== */
+
+.lq-config {
+  padding: 24px;
+  background: #f6f8fb;
+  min-height: 100vh;
+}
+
+/* Page header */
+.lq-config__header {
+  margin-bottom: 24px;
+}
+
+.lq-config__header-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lq-config__header-icon {
+  width: 24px;
+  height: 24px;
+  color: #6366f1;
+}
+
+.lq-config__title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.lq-config__subtitle {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* Card */
+.lq-config__card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  border: 1px solid #eef1f6;
+  margin-bottom: 24px;
+}
+
+.lq-config__card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 16px;
+}
+
+/* Row group */
+.lq-config__group-row {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.lq-config__input,
+.lq-config__textarea {
+  padding: 10px 14px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #111827;
+  background: #f9fafb;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+}
+
+.lq-config__input--flex {
+  flex: 1;
+}
+
+.lq-config__textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.lq-config__input:focus,
+.lq-config__textarea:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  background: #fff;
+}
+
+.lq-config__input::placeholder,
+.lq-config__textarea::placeholder {
+  color: #9ca3af;
+}
+
+/* Checkbox Grid */
+.lq-config__checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.lq-config__checkbox-label {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #fff;
+}
+
+.lq-config__checkbox-label:hover {
+  border-color: #c7d2fe;
+}
+
+.lq-config__checkbox-label--active {
+  border-color: #6366f1;
+  background: #eef2ff;
+}
+
+.lq-config__checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #6366f1;
+  cursor: pointer;
+}
+
+.lq-config__checkbox-text {
+  margin-left: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* Service Boxes */
+.lq-config__service-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.lq-config__service-box {
+  padding: 20px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.lq-config__service-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 6px;
+}
+
+.lq-config__service-icon {
+  width: 16px;
+  height: 16px;
+  color: #6366f1;
+}
+
+.lq-config__service-hint {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+/* Error */
+.lq-config__error {
+  font-size: 13px;
+  color: #dc2626;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  max-width: 900px;
+}
+
+/* Success */
+@keyframes lq-success-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.lq-config__success {
+  font-size: 13px;
+  font-weight: 500;
+  color: #059669;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  max-width: 900px;
+}
+
+.lq-config__success--anim {
+  animation: lq-success-in 0.3s ease;
+}
+
+/* Actions */
+.lq-config__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.lq-config__btn {
+  padding: 10px 24px;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.lq-config__btn-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.lq-config__btn--primary {
+  background: #111827;
+  color: #fff;
+}
+
+.lq-config__btn--primary:hover:not(:disabled) {
+  background: #1f2937;
+  transform: translateY(-1px);
+}
+
+.lq-config__btn--success {
+  background: #059669;
+  color: #fff;
+}
+
+.lq-config__btn--success:hover:not(:disabled) {
+  background: #047857;
+  transform: translateY(-1px);
+}
+
+.lq-config__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.lq-config__btn--outline {
+  background: #fff;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.lq-config__btn--outline:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  transform: translateY(-1px);
+}
+
+/* Table */
+.lq-config__table-wrapper {
+  overflow-x: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  margin-top: 16px;
+}
+
+.lq-config__table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.lq-config__table thead tr {
+  background: #f9fafb;
+  border-bottom: 1px solid #eef1f6;
+}
+
+.lq-config__table th {
+  padding: 14px 20px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.lq-config__table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f3f6;
+  font-size: 14px;
+  color: #111827;
+}
+
+.lq-config__table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.lq-config__table tbody tr:hover {
+  background: #fafbfc;
+}
+
+.lq-config__table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.lq-config__table-questions {
+  white-space: pre-wrap;
+  max-width: 300px;
+}
+
+.lq-config__action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 6px;
+}
+
+.lq-config__action-btn--edit {
+  color: #3b82f6;
+}
+.lq-config__action-btn--edit:hover {
+  background: #eff6ff;
+}
+
+.lq-config__action-btn--delete {
+  color: #ef4444;
+}
+.lq-config__action-btn--delete:hover {
+  background: #fef2f2;
+}
+
+/* ==============================
+   DARK MODE
+============================== */
+.dark .lq-config {
+  background: #0f172a;
+}
+
+.dark .lq-config__title,
+.dark .lq-config__card-title,
+.dark .lq-config__service-title,
+.dark .lq-config__checkbox-text {
+  color: #f1f5f9;
+}
+
+.dark .lq-config__header-icon {
+  color: #818cf8;
+}
+
+.dark .lq-config__subtitle,
+.dark .lq-config__service-hint {
+  color: #94a3b8;
+}
+
+.dark .lq-config__card {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: none;
+}
+
+.dark .lq-config__input,
+.dark .lq-config__textarea,
+.dark .lq-config__service-box,
+.dark .lq-config__checkbox-label {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+.dark .lq-config__input:focus,
+.dark .lq-config__textarea:focus {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
+  background: #1e293b;
+}
+
+.dark .lq-config__checkbox-label:hover {
+  border-color: #4f46e5;
+}
+
+.dark .lq-config__checkbox-label--active {
+  border-color: #818cf8;
+  background: #1e1b4b;
+}
+
+.dark .lq-config__btn--outline {
+  background: #1e293b;
+  color: #e2e8f0;
+  border-color: #334155;
+}
+
+.dark .lq-config__btn--outline:hover:not(:disabled) {
+  background: #334155;
+  border-color: #475569;
+}
+
+.dark .lq-config__table-wrapper {
+  border-color: #334155;
+  background: #1e293b;
+}
+.dark .lq-config__table th,
+.dark .lq-config__table td {
+  border-color: #334155;
+}
+.dark .lq-config__table thead tr {
+  background: #172033;
+  border-bottom-color: #334155;
+}
+.dark .lq-config__table th {
+  color: #94a3b8;
+}
+.dark .lq-config__table td {
+  color: #f1f5f9;
+  border-bottom-color: #334155;
+}
+.dark .lq-config__table tbody tr:hover {
+  background: #233047;
+}
+.dark .lq-config__action-btn--edit:hover {
+  background: rgba(59, 130, 246, 0.1);
+}
+.dark .lq-config__action-btn--delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+}

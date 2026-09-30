@@ -123,7 +123,9 @@ export const AiContextAdd = () => {
 
       if (res.data.status) {
         setSuccess("✅ Context created successfully!");
-        setTimeout(() => navigate("/dashboard/ai-contexts"), 1200);
+        setContext("");
+        setPrompt("");
+        setTimeout(() => setSuccess(""), 3000);
       } else {
         setError(res.data.message || "Failed to create context.");
       }

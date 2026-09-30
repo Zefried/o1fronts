@@ -151,6 +151,16 @@ export const menus: Record<Role, MenuItem[]> = {
           icon: Plus,
           path: "/dashboard/businesses/add",
         },
+        {
+          name: "Add Qualification",
+          icon: Settings,
+          path: "/dashboard/lead-qualification",
+        },
+        {
+          name: "View Qualifications",
+          icon: List,
+          path: "/dashboard/lead-qualification/view",
+        },
       ],
     },
   ],

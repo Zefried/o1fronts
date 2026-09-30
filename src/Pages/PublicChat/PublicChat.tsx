@@ -23,7 +23,7 @@ function generateId(): string {
 const WELCOME_MESSAGE: ChatMessage = {
   id: "welcome",
   role: "assistant",
-  content: "",
+  content: "Sure! I can help you find the best services. Let me know what you are looking for.",
   timestamp: new Date(),
 };
 
@@ -62,6 +62,7 @@ export const PublicChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([WELCOME_MESSAGE]);
   const [input, setInput] = useState("");
   const [typingStatus, setTypingStatus] = useState<'none' | 'just_a_sec...' | 'typing'>('none');
+  const [contextState, setContextState] = useState<any>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -71,12 +72,25 @@ export const PublicChat = () => {
       try {
         const decoded = atob(token);
         const parts = decoded.split("||");
-        setBusinessId(parts[0]);
+        const id = parts[0];
+        setBusinessId(id);
+        
+        const storedContext = localStorage.getItem(`chat_context_${id}`);
+        if (storedContext) {
+          setContextState(JSON.parse(storedContext));
+        }
       } catch (e) {
         console.error("Invalid token");
       }
     }
   }, [token]);
+
+  // Sync context state to local storage
+  useEffect(() => {
+    if (businessId && contextState) {
+      localStorage.setItem(`chat_context_${businessId}`, JSON.stringify(contextState));
+    }
+  }, [contextState, businessId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -87,12 +101,14 @@ export const PublicChat = () => {
     if (businessId) {
       const fetchInitialGreeting = async () => {
         setTypingStatus('just_a_sec...');
-        try {
+          try {
           const res = await api.post('/public/chat', {
             // We send an initial trigger message so the AI can greet us
             message: "Hello",
             chat: [],
-            business_id: businessId
+            business_id: businessId,
+            campaign_link: window.location.href,
+            context_state: contextState
           });
 
           if (res.data.status && res.data.data?.reply) {
@@ -104,6 +120,15 @@ export const PublicChat = () => {
                 timestamp: new Date(),
               }
             ]);
+            
+            if (res.data.data.context_state) {
+              setContextState(res.data.data.context_state);
+              
+              const demand = res.data.data.context_state.businessContext?.backendData?.UserServiceDemand;
+              if (demand) {
+                localStorage.setItem('userDemandService', demand);
+              }
+            }
           }
         } catch (err) {
           console.error("Failed to fetch initial greeting", err);
@@ -124,6 +149,10 @@ export const PublicChat = () => {
         timestamp: new Date(),
       },
     ]);
+    setContextState(null);
+    if (businessId) {
+      localStorage.removeItem(`chat_context_${businessId}`);
+    }
     inputRef.current?.focus();
   };
 
@@ -151,13 +180,18 @@ export const PublicChat = () => {
       const res = await api.post('/public/chat', {
         message: text,
         chat: messages.map(m => ({ role: m.role, content: m.content })),
-        business_id: businessId
+        business_id: businessId,
+        campaign_link: window.location.href,
+        context_state: contextState
       });
       const data = res.data;
 
       let replyContent = "Sorry, I am unable to fulfill that request right now.";
       if (data.status && data.data?.reply) {
         replyContent = data.data.reply;
+        if (data.data.context_state) {
+          setContextState(data.data.context_state);
+        }
       }
 
       const aiMsg: ChatMessage = {

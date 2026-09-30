@@ -13,6 +13,7 @@ import { attributeRoutes } from "./Admin/Attributes/AttributeRoutes";
 import { aiContextRoutes } from "./Admin/AiContext/AiContextRoutes";
 import { playgroundRoutes } from "./Admin/Playground/PlaygroundRoutes";
 import { businessRoutes } from "./Admin/Business/BusinessRoutes";
+import { leadQualificationRoutes } from "./Admin/LeadQualification/LeadQualificationRoutes";
 
 const router = createBrowserRouter([
   {
@@ -53,6 +54,7 @@ const router = createBrowserRouter([
       ...aiContextRoutes,
       ...playgroundRoutes,
       ...businessRoutes,
+      ...leadQualificationRoutes,
     ],
   },
 ]);
