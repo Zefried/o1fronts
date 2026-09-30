@@ -74,7 +74,7 @@ export const PublicChat = () => {
         const parts = decoded.split("||");
         const id = parts[0];
         setBusinessId(id);
-        
+
         const storedContext = localStorage.getItem(`chat_context_${id}`);
         if (storedContext) {
           setContextState(JSON.parse(storedContext));
@@ -101,7 +101,7 @@ export const PublicChat = () => {
     if (businessId) {
       const fetchInitialGreeting = async () => {
         setTypingStatus('just_a_sec...');
-          try {
+        try {
           const res = await api.post('/public/chat', {
             // We send an initial trigger message so the AI can greet us
             message: "Hello",
@@ -120,10 +120,10 @@ export const PublicChat = () => {
                 timestamp: new Date(),
               }
             ]);
-            
+
             if (res.data.data.context_state) {
               setContextState(res.data.data.context_state);
-              
+
               const demand = res.data.data.context_state.businessContext?.backendData?.UserServiceDemand;
               if (demand) {
                 localStorage.setItem('userDemandService', demand);
