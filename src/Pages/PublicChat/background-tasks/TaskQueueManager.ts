@@ -18,7 +18,7 @@ class TaskQueueManager {
       type,
       payload
     };
-    
+
     this.queue.push(task);
     this.processQueue();
   }
