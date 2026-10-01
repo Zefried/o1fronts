@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { Send } from "lucide-react";
 import { PublicChatSidebar } from "./Layout/Sidebar/PublicChatSidebar";
 import api from "../../api/axios";
+import { useBackgroundTasks } from "./background-tasks/useBackgroundTasks";
 import "./Styles/PublicChat.css";
 
 interface ChatMessage {
@@ -63,6 +64,7 @@ export const PublicChat = () => {
   const [input, setInput] = useState("");
   const [typingStatus, setTypingStatus] = useState<'none' | 'just_a_sec...' | 'typing'>('none');
   const [contextState, setContextState] = useState<any>(null);
+  const { pushTask } = useBackgroundTasks();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -202,6 +204,14 @@ export const PublicChat = () => {
       };
 
       setMessages((prev) => [...prev, aiMsg]);
+
+      if (data.status && replyContent !== "Sorry, I am unable to fulfill that request right now.") {
+        pushTask('EYE_ON_RESPONSES', {
+          userMessage: text,
+          aiReply: replyContent,
+          chatContext: data.data.context_state
+        });
+      }
     } catch (err) {
       setMessages((prev) => [
         ...prev,
