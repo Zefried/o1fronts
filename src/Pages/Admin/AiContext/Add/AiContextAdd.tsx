@@ -45,6 +45,7 @@ export const AiContextAdd = () => {
   const [attributeDefinition, setAttributeDefinition] = useState("");
   const [context, setContext] = useState("");
   const [prompt, setPrompt] = useState("");
+  const [images, setImages] = useState<FileList | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -94,6 +95,7 @@ export const AiContextAdd = () => {
     setBusinessId("");
     setContext("");
     setPrompt("");
+    setImages(null);
     setError("");
     setSuccess("");
   };
@@ -113,18 +115,28 @@ export const AiContextAdd = () => {
     setSuccess("");
 
     try {
-      const res = await api.post("/admin/ai-contexts", {
-        business_id: businessId.trim(),
-        service_name: serviceName,
-        attribute_definition: attributeDefinition,
-        context: context.trim(),
-        prompt: prompt.trim(),
+      const formData = new FormData();
+      formData.append("business_id", businessId.trim());
+      formData.append("service_name", serviceName);
+      formData.append("attribute_definition", attributeDefinition);
+      formData.append("context", context.trim());
+      formData.append("prompt", prompt.trim());
+      
+      if (images && images.length > 0) {
+        for (let i = 0; i < images.length; i++) {
+          formData.append(`images[${i}]`, images[i]);
+        }
+      }
+
+      const res = await api.post("/admin/ai-contexts", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       if (res.data.status) {
         setSuccess("✅ Context created successfully!");
         setContext("");
         setPrompt("");
+        setImages(null);
         setTimeout(() => setSuccess(""), 3000);
       } else {
         setError(res.data.message || "Failed to create context.");
@@ -278,6 +290,22 @@ export const AiContextAdd = () => {
               onChange={(e) => { setPrompt(e.target.value); setError(""); }}
             />
             <span className="aca__hint">Keep it short and include a constraint (e.g. "Do not invent…").</span>
+          </div>
+
+          <div className="aca__group">
+            <label className="aca__label" htmlFor="aca-images">
+              Portfolio Images (Optional)
+            </label>
+            <input
+              id="aca-images"
+              type="file"
+              multiple
+              accept="image/*"
+              className="aca__input"
+              style={{ padding: '10px' }}
+              onChange={(e) => setImages(e.target.files)}
+            />
+            <span className="aca__hint">Select multiple images to attach to this context.</span>
           </div>
 
           {error   && <p className="aca__error">{error}</p>}

@@ -11,6 +11,7 @@ interface AiContext {
   attribute_definition: string;
   context: string;
   prompt: string;
+  images?: Array<{ id: number; image_url: string; image_name: string }>;
 }
 
 interface FlatCategory {
@@ -522,6 +523,51 @@ const DeleteModal = ({
   );
 };
 
+// ─── Images Modal ─────────────────────────────────────────────────────────────
+
+const ImagesModal = ({
+  record,
+  onClose,
+}: {
+  record: AiContext;
+  onClose: () => void;
+}) => {
+  const images = record.images || [];
+
+  return (
+    <div className="acv-modal-overlay">
+      <div className="acv-modal acv-modal--images">
+        <div className="acv-modal-header">
+          <h2 className="acv-modal-title">Images for {record.service_name}</h2>
+          <button className="acv-modal-close" onClick={onClose}>×</button>
+        </div>
+        <div className="acv-modal-body">
+          {images.length === 0 ? (
+            <p style={{ textAlign: "center", color: "var(--acv-text-muted)" }}>No images uploaded.</p>
+          ) : (
+            <div className="acv-images-grid">
+              {images.map((img) => {
+                const imgUrl = `http://127.0.0.1:8000/storage/${img.image_url}`;
+                return (
+                  <div key={img.id} className="acv-image-item">
+                    <img src={imgUrl} alt={img.image_name} className="acv-image-thumb" />
+                    <a href={imgUrl} target="_blank" rel="noreferrer" className="acv-image-link" title={img.image_name}>
+                      View Link
+                    </a>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+        <div className="acv-modal-footer">
+          <button className="acv-btn acv-btn--secondary" onClick={onClose}>Close</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export const AiContextView = () => {
@@ -535,6 +581,7 @@ export const AiContextView = () => {
   const [showAdd, setShowAdd] = useState(false);
   const [editTarget, setEditTarget] = useState<AiContext | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<AiContext | null>(null);
+  const [imagesTarget, setImagesTarget] = useState<AiContext | null>(null);
 
   const { toasts, addToast } = useToast();
 
@@ -676,6 +723,16 @@ export const AiContextView = () => {
                     </td>
                     <td className="acv-td">
                       <div className="acv-actions">
+                        {r.images && r.images.length > 0 && (
+                          <button
+                            id={`ctx-images-${r.id}`}
+                            className="acv-action-btn acv-action-btn--images"
+                            onClick={() => setImagesTarget(r)}
+                            title="View Images"
+                          >
+                            🖼️ <span style={{ fontSize: "12px", marginLeft: "2px" }}>({r.images.length})</span>
+                          </button>
+                        )}
                         <button
                           id={`ctx-edit-${r.id}`}
                           className="acv-action-btn acv-action-btn--edit"
@@ -726,6 +783,12 @@ export const AiContextView = () => {
           onClose={() => setDeleteTarget(null)}
           onDeleted={fetchData}
           addToast={addToast}
+        />
+      )}
+      {imagesTarget && (
+        <ImagesModal
+          record={imagesTarget}
+          onClose={() => setImagesTarget(null)}
         />
       )}
     </div>
