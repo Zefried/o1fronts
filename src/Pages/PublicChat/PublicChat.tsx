@@ -68,6 +68,7 @@ export const PublicChat = () => {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const shadowQuestionPendingRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (token) {
@@ -97,6 +98,48 @@ export const PublicChat = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typingStatus]);
+
+  useEffect(() => {
+    const handleShadowQuestion = (event: any) => {
+      const question = event.detail.question;
+      shadowQuestionPendingRef.current = true; // Mark that shadow question is now pending
+      
+      setTypingStatus('just_a_sec...');
+      setTimeout(() => {
+        setTypingStatus('typing');
+        setTimeout(() => {
+          setTypingStatus('none');
+          setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            role: 'assistant',
+            content: question,
+            timestamp: new Date()
+          }]);
+        }, 1500);
+      }, 1000);
+    };
+
+    const handleLeadStateUpdated = (event: any) => {
+      const newLeadState = event.detail.leadQualificationState;
+      setContextState((prev: any) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          chatContext: {
+            ...prev.chatContext,
+            leadQualificationState: newLeadState
+          }
+        };
+      });
+    };
+
+    window.addEventListener('shadow_question', handleShadowQuestion);
+    window.addEventListener('lead_state_updated', handleLeadStateUpdated);
+    return () => {
+      window.removeEventListener('shadow_question', handleShadowQuestion);
+      window.removeEventListener('lead_state_updated', handleLeadStateUpdated);
+    };
+  }, []);
 
   // Initial request when component mounts and businessId is ready
   useEffect(() => {
@@ -206,11 +249,23 @@ export const PublicChat = () => {
       setMessages((prev) => [...prev, aiMsg]);
 
       if (data.status && replyContent !== "Sorry, I am unable to fulfill that request right now.") {
+        // Always run eye-on-responses for shadow question generation
         pushTask('EYE_ON_RESPONSES', {
           userMessage: text,
           aiReply: replyContent,
           chatContext: data.data.context_state
         });
+
+        // If a shadow question was pending, run extraction in background
+        if (shadowQuestionPendingRef.current && data.data.context_state) {
+          shadowQuestionPendingRef.current = false;
+          const ctx = data.data.context_state;
+          pushTask('EXTRACT_LEAD_DATA', {
+            infoHistory: ctx.chatContext?.infoHistory ?? [],
+            chatContext: ctx.chatContext ?? {},
+            businessContext: ctx.businessContext ?? {}
+          });
+        }
       }
     } catch (err) {
       setMessages((prev) => [

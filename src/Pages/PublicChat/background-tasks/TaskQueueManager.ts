@@ -1,6 +1,6 @@
 import api from "../../../api/axios";
 
-export type BackgroundTaskType = 'EYE_ON_RESPONSES'; // Add more task types here in future
+export type BackgroundTaskType = 'EYE_ON_RESPONSES' | 'EXTRACT_LEAD_DATA';
 
 export interface BackgroundTask {
   id: string;
@@ -43,7 +43,25 @@ class TaskQueueManager {
       if (task.type === 'EYE_ON_RESPONSES') {
         const response = await api.post('/public/eye-on-responses', task.payload);
         console.log('[Background Task: Eye On Responses]', response.data);
-        // You can dispatch a global event here if you want other components to react to this
+        
+        if (response.data?.status && response.data?.data?.shadow_generated_question) {
+          window.dispatchEvent(new CustomEvent('shadow_question', {
+            detail: {
+              question: response.data.data.shadow_generated_question
+            }
+          }));
+        }
+      } else if (task.type === 'EXTRACT_LEAD_DATA') {
+        const response = await api.post('/public/extract-lead-data', task.payload);
+        console.log('[Background Task: Extract Lead Data]', response.data);
+
+        if (response.data?.status && response.data?.data?.leadQualificationState) {
+          window.dispatchEvent(new CustomEvent('lead_state_updated', {
+            detail: {
+              leadQualificationState: response.data.data.leadQualificationState
+            }
+          }));
+        }
       }
     } catch (error) {
       console.error(`[Background Task Failed] ${task.type}`, error);
