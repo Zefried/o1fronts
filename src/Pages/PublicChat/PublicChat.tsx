@@ -256,9 +256,8 @@ export const PublicChat = () => {
           chatContext: data.data.context_state
         });
 
-        // If a shadow question was pending, run extraction in background
-        if (shadowQuestionPendingRef.current && data.data.context_state) {
-          shadowQuestionPendingRef.current = false;
+        // If history length is more than 3, run extraction in background
+        if (messages.length > 3 && data.data.context_state) {
           const ctx = data.data.context_state;
           pushTask('EXTRACT_LEAD_DATA', {
             infoHistory: ctx.chatContext?.infoHistory ?? [],
