@@ -582,6 +582,8 @@ export const AiContextView = () => {
   const [editTarget, setEditTarget] = useState<AiContext | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<AiContext | null>(null);
   const [imagesTarget, setImagesTarget] = useState<AiContext | null>(null);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
 
   const { toasts, addToast } = useToast();
 
@@ -613,6 +615,37 @@ export const AiContextView = () => {
     r.attribute_definition.toLowerCase().includes(search.toLowerCase())
   );
 
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedIds(filtered.map(r => r.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectOne = (id: number) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+  const handleBulkDelete = async () => {
+    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} contexts?`)) return;
+    setBulkDeleting(true);
+    try {
+      const res = await api.post("/admin/ai-contexts/bulk-delete", { ids: selectedIds });
+      if (res.data.status) {
+        addToast("success", res.data.message);
+        setSelectedIds([]);
+        fetchData();
+      } else {
+        addToast("error", res.data.message);
+      }
+    } catch {
+      addToast("error", "Failed to perform bulk delete.");
+    } finally {
+      setBulkDeleting(false);
+    }
+  };
+
   return (
     <div className="acv">
       {/* Toast Stack */}
@@ -628,9 +661,16 @@ export const AiContextView = () => {
           <h1 className="acv-title">AI Contexts</h1>
           <p className="acv-subtitle">Manage service + attribute context data for the AI chatbot.</p>
         </div>
-        <button id="ctx-add-btn" className="acv-btn acv-btn--primary" onClick={() => setShowAdd(true)}>
-          + Add Context
-        </button>
+        <div style={{ display: "flex", gap: "10px" }}>
+          {selectedIds.length > 0 && (
+            <button className="acv-btn acv-btn--danger" onClick={handleBulkDelete} disabled={bulkDeleting}>
+              {bulkDeleting ? "Deleting..." : `Delete Selected (${selectedIds.length})`}
+            </button>
+          )}
+          <button id="ctx-add-btn" className="acv-btn acv-btn--primary" onClick={() => setShowAdd(true)}>
+            + Add Context
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -689,6 +729,14 @@ export const AiContextView = () => {
             <table className="acv-table">
               <thead>
                 <tr>
+                  <th className="acv-th" style={{ width: '40px', textAlign: 'center' }}>
+                    <input 
+                      type="checkbox" 
+                      className="acv-checkbox"
+                      checked={filtered.length > 0 && selectedIds.length === filtered.length}
+                      onChange={handleSelectAll}
+                    />
+                  </th>
                   <th className="acv-th">#</th>
                   <th className="acv-th">Business ID</th>
                   <th className="acv-th">Service</th>
@@ -701,6 +749,14 @@ export const AiContextView = () => {
               <tbody>
                 {filtered.map((r) => (
                   <tr key={r.id} className="acv-row">
+                    <td className="acv-td" style={{ textAlign: 'center' }}>
+                      <input 
+                        type="checkbox" 
+                        className="acv-checkbox"
+                        checked={selectedIds.includes(r.id)}
+                        onChange={() => handleSelectOne(r.id)}
+                      />
+                    </td>
                     <td className="acv-td acv-td--id">{r.id}</td>
                     <td className="acv-td">
                       <span className="acv-business-badge">{r.business_id}</span>
