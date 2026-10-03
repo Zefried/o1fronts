@@ -14,6 +14,7 @@ import { aiContextRoutes } from "./Admin/AiContext/AiContextRoutes";
 import { playgroundRoutes } from "./Admin/Playground/PlaygroundRoutes";
 import { businessRoutes } from "./Admin/Business/BusinessRoutes";
 import { leadQualificationRoutes } from "./Admin/LeadQualification/LeadQualificationRoutes";
+import { TestingGPT } from "../Pages/TestingGPT/TestingGPT";
 
 const router = createBrowserRouter([
   {
@@ -55,6 +56,10 @@ const router = createBrowserRouter([
       ...playgroundRoutes,
       ...businessRoutes,
       ...leadQualificationRoutes,
+      {
+        path: "testing-gpt",
+        element: <TestingGPT />,
+      },
     ],
   },
 ]);
