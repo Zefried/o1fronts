@@ -14,6 +14,7 @@ import {
   Plus,
   MessageSquare,
   Bot,
+  FlaskConical,
 } from "lucide-react";
 
 export type Role = "admin" | "subadmin" | "department";
@@ -35,6 +36,12 @@ export const menus: Record<Role, MenuItem[]> = {
       name: "Dashboard",
       icon: Home,
       path: "/dashboard",
+    },
+
+    {
+      name: "TestingGPT",
+      icon: FlaskConical,
+      path: "/dashboard/testing-gpt",
     },
 
     {
