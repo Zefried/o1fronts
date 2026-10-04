@@ -67,7 +67,7 @@ export const PublicChat = () => {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const shadowQuestionPendingRef = useRef<boolean>(false);
+  const hasFetchedGreeting = useRef<boolean>(false);
 
   useEffect(() => {
     if (token) {
@@ -77,15 +77,16 @@ export const PublicChat = () => {
         const id = parts[0];
         setBusinessId(id);
 
-        const storedContext = localStorage.getItem(`chat_context_${id}`);
-        if (storedContext) {
-          setContextState(JSON.parse(storedContext));
-        }
 
         api.post('/public/chat/init', { token, businessId: id })
           .then(res => {
             if (res.data?.status && res.data?.data) {
-              localStorage.setItem('businessContext', JSON.stringify(res.data.data));
+              const newBusinessContext = res.data.data;
+              
+              setContextState((prev: any) => ({
+                ...(prev || {}),
+                businessContext: newBusinessContext
+              }));
             }
           })
           .catch(err => console.error("Failed to fetch business context", err));
@@ -96,62 +97,17 @@ export const PublicChat = () => {
     }
   }, [token]);
 
-  // Sync context state to local storage
-  useEffect(() => {
-    if (businessId && contextState) {
-      localStorage.setItem(`chat_context_${businessId}`, JSON.stringify(contextState));
-    }
-  }, [contextState, businessId]);
+
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typingStatus]);
 
-  useEffect(() => {
-    const handleShadowQuestion = (event: any) => {
-      const question = event.detail.question;
-      shadowQuestionPendingRef.current = true; // Mark that shadow question is now pending
-
-      setTypingStatus('just_a_sec...');
-      setTimeout(() => {
-        setTypingStatus('typing');
-        setTimeout(() => {
-          setTypingStatus('none');
-          setMessages(prev => [...prev, {
-            id: Date.now().toString(),
-            role: 'assistant',
-            content: question,
-            timestamp: new Date()
-          }]);
-        }, 1500);
-      }, 1000);
-    };
-
-    const handleLeadStateUpdated = (event: any) => {
-      const newLeadState = event.detail.leadQualificationState;
-      setContextState((prev: any) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          chatContext: {
-            ...prev.chatContext,
-            leadQualificationState: newLeadState
-          }
-        };
-      });
-    };
-
-    window.addEventListener('shadow_question', handleShadowQuestion);
-    window.addEventListener('lead_state_updated', handleLeadStateUpdated);
-    return () => {
-      window.removeEventListener('shadow_question', handleShadowQuestion);
-      window.removeEventListener('lead_state_updated', handleLeadStateUpdated);
-    };
-  }, []);
 
   // Initial request when component mounts and businessId is ready
   useEffect(() => {
-    if (businessId) {
+    if (businessId && contextState?.businessContext && messages.length === 1 && messages[0].id === 'welcome' && !hasFetchedGreeting.current) {
+      hasFetchedGreeting.current = true;
       const fetchInitialGreeting = async () => {
         setTypingStatus('just_a_sec...');
         try {
@@ -175,12 +131,11 @@ export const PublicChat = () => {
             ]);
 
             if (res.data.data.context_state) {
-              setContextState(res.data.data.context_state);
-
-              const demand = res.data.data.context_state.businessContext?.backendData?.UserServiceDemand;
-              if (demand) {
-                localStorage.setItem('userDemandService', demand);
-              }
+              setContextState((prev: any) => ({
+                ...(prev || {}),
+                chatContext: res.data.data.context_state.chatContext,
+                businessContext: prev?.businessContext
+              }));
             }
           }
         } catch (err) {
@@ -192,7 +147,7 @@ export const PublicChat = () => {
 
       fetchInitialGreeting();
     }
-  }, [businessId]);
+  }, [businessId, contextState, messages]);
 
   const handleClearChat = () => {
     setMessages([
@@ -202,10 +157,11 @@ export const PublicChat = () => {
         timestamp: new Date(),
       },
     ]);
-    setContextState(null);
-    if (businessId) {
-      localStorage.removeItem(`chat_context_${businessId}`);
-    }
+    setContextState((prev: any) => ({
+      businessContext: prev?.businessContext,
+      chatContext: { infoHistory: [], chat_status: null }
+    }));
+    hasFetchedGreeting.current = false;
     inputRef.current?.focus();
   };
 
@@ -243,7 +199,11 @@ export const PublicChat = () => {
       if (data.status && data.data?.reply) {
         replyContent = data.data.reply;
         if (data.data.context_state) {
-          setContextState(data.data.context_state);
+          setContextState((prev: any) => ({
+            ...(prev || {}),
+            chatContext: data.data.context_state.chatContext,
+            businessContext: prev?.businessContext
+          }));
         }
       }
 
@@ -256,9 +216,6 @@ export const PublicChat = () => {
 
       setMessages((prev) => [...prev, aiMsg]);
 
-      if (data.status && replyContent !== "Sorry, I am unable to fulfill that request right now.") {
-        // Redesign: Background task dispatch logic removed
-      }
     } catch (err) {
       setMessages((prev) => [
         ...prev,
