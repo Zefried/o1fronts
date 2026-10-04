@@ -81,6 +81,15 @@ export const PublicChat = () => {
         if (storedContext) {
           setContextState(JSON.parse(storedContext));
         }
+
+        api.post('/public/chat/init', { token, businessId: id })
+          .then(res => {
+            if (res.data?.status && res.data?.data) {
+              localStorage.setItem('businessContext', JSON.stringify(res.data.data));
+            }
+          })
+          .catch(err => console.error("Failed to fetch business context", err));
+
       } catch (e) {
         console.error("Invalid token");
       }
