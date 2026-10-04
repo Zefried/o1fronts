@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { Send } from "lucide-react";
 import { PublicChatSidebar } from "./Layout/Sidebar/PublicChatSidebar";
 import api from "../../api/axios";
-import { useBackgroundTasks } from "./background-tasks/useBackgroundTasks";
 import "./Styles/PublicChat.css";
 
 interface ChatMessage {
@@ -64,7 +63,7 @@ export const PublicChat = () => {
   const [input, setInput] = useState("");
   const [typingStatus, setTypingStatus] = useState<'none' | 'just_a_sec...' | 'typing'>('none');
   const [contextState, setContextState] = useState<any>(null);
-  const { pushTask } = useBackgroundTasks();
+
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -103,7 +102,7 @@ export const PublicChat = () => {
     const handleShadowQuestion = (event: any) => {
       const question = event.detail.question;
       shadowQuestionPendingRef.current = true; // Mark that shadow question is now pending
-      
+
       setTypingStatus('just_a_sec...');
       setTimeout(() => {
         setTypingStatus('typing');
@@ -249,22 +248,7 @@ export const PublicChat = () => {
       setMessages((prev) => [...prev, aiMsg]);
 
       if (data.status && replyContent !== "Sorry, I am unable to fulfill that request right now.") {
-        // Always run eye-on-responses for shadow question generation
-        pushTask('EYE_ON_RESPONSES', {
-          userMessage: text,
-          aiReply: replyContent,
-          chatContext: data.data.context_state
-        });
-
-        // If history length is more than 3, run extraction in background
-        if (messages.length > 3 && data.data.context_state) {
-          const ctx = data.data.context_state;
-          pushTask('EXTRACT_LEAD_DATA', {
-            infoHistory: ctx.chatContext?.infoHistory ?? [],
-            chatContext: ctx.chatContext ?? {},
-            businessContext: ctx.businessContext ?? {}
-          });
-        }
+        // Redesign: Background task dispatch logic removed
       }
     } catch (err) {
       setMessages((prev) => [
