@@ -159,7 +159,7 @@ export const PublicChat = () => {
     ]);
     setContextState((prev: any) => ({
       businessContext: prev?.businessContext,
-      chatContext: { infoHistory: [], chat_status: null }
+      chatContext: { infoHistory: [] }
     }));
     hasFetchedGreeting.current = false;
     inputRef.current?.focus();
