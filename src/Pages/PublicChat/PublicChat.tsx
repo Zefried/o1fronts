@@ -5,14 +5,17 @@ import { PublicChatSidebar } from "./Layout/Sidebar/PublicChatSidebar";
 import api from "../../api/axios";
 import "./Styles/PublicChat.css";
 
-interface ChatMessage {
+import { AnimatedDots } from "./AnimatedDots";
+import { MessageBubble } from "./MessageBubble";
+
+export interface ChatMessage {
   id: string;
   role: "user" | "assistant" | "system";
   content: string;
   timestamp: Date;
 }
 
-function formatTime(date: Date): string {
+export function formatTime(date: Date): string {
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
@@ -27,33 +30,7 @@ const WELCOME_MESSAGE: ChatMessage = {
   timestamp: new Date(),
 };
 
-const AnimatedDots = ({ text }: { text: string }) => {
-  const [dots, setDots] = useState("");
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setDots(prev => (prev.length >= 3 ? "" : prev + "."));
-    }, 400);
-    return () => clearInterval(interval);
-  }, []);
-  return <span>{text}{dots}</span>;
-};
 
-const MessageBubble = ({ msg }: { msg: ChatMessage }) => {
-  const isUser = msg.role === "user";
-  return (
-    <div className={`chat-message-row ${isUser ? "user" : "ai"}`}>
-      <div className="chat-bubble">
-        {msg.content.split("\n").map((line, i) => (
-          <React.Fragment key={i}>
-            {line}
-            {i < msg.content.split("\n").length - 1 && <br />}
-          </React.Fragment>
-        ))}
-      </div>
-      <span className="chat-timestamp">{formatTime(msg.timestamp)}</span>
-    </div>
-  );
-};
 
 export const PublicChat = () => {
   const { token } = useParams<{ token: string }>();
