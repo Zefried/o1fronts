@@ -104,50 +104,7 @@ export const PublicChat = () => {
   }, [messages, typingStatus]);
 
 
-  // Initial request when component mounts and businessId is ready
-  useEffect(() => {
-    if (businessId && contextState?.businessContext && messages.length === 1 && messages[0].id === 'welcome' && !hasFetchedGreeting.current) {
-      hasFetchedGreeting.current = true;
-      const fetchInitialGreeting = async () => {
-        setTypingStatus('just_a_sec...');
-        try {
-          const res = await api.post('/public/chat', {
-            // We send an initial trigger message so the AI can greet us
-            message: "Hello",
-            chat: [],
-            business_id: businessId,
-            campaign_link: window.location.href,
-            context_state: contextState
-          });
 
-          if (res.data.status && res.data.data?.reply) {
-            setMessages([
-              {
-                id: generateId(),
-                role: "assistant",
-                content: res.data.data.reply,
-                timestamp: new Date(),
-              }
-            ]);
-
-            if (res.data.data.context_state) {
-              setContextState((prev: any) => ({
-                ...(prev || {}),
-                chatContext: res.data.data.context_state.chatContext,
-                businessContext: prev?.businessContext
-              }));
-            }
-          }
-        } catch (err) {
-          console.error("Failed to fetch initial greeting", err);
-        } finally {
-          setTypingStatus('none');
-        }
-      };
-
-      fetchInitialGreeting();
-    }
-  }, [businessId, contextState, messages]);
 
   const handleClearChat = () => {
     setMessages([
