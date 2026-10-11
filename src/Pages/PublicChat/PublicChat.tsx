@@ -26,7 +26,7 @@ function generateId(): string {
 const WELCOME_MESSAGE: ChatMessage = {
   id: "welcome",
   role: "assistant",
-  content: "Sure! I can help you find the best services. Let me know what you are looking for.",
+  content: "Hello.",
   timestamp: new Date(),
 };
 
@@ -44,7 +44,6 @@ export const PublicChat = () => {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const hasFetchedGreeting = useRef<boolean>(false);
 
   useEffect(() => {
     if (token) {
@@ -59,7 +58,7 @@ export const PublicChat = () => {
           .then(res => {
             if (res.data?.status && res.data?.data) {
               const newBusinessContext = res.data.data;
-              
+
               setContextState((prev: any) => ({
                 ...(prev || {}),
                 businessContext: newBusinessContext
@@ -95,7 +94,6 @@ export const PublicChat = () => {
       businessContext: prev?.businessContext,
       chatContext: { infoHistory: [] }
     }));
-    hasFetchedGreeting.current = false;
     inputRef.current?.focus();
   };
 

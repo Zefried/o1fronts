@@ -29,6 +29,11 @@ interface ApiError {
   message?: string;
 }
 
+interface YouTubeLinkInput {
+  url: string;
+  title: string;
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export const AiContextAdd = () => {
@@ -46,10 +51,28 @@ export const AiContextAdd = () => {
   const [context, setContext] = useState("");
   const [prompt, setPrompt] = useState("");
   const [images, setImages] = useState<FileList | null>(null);
+  const [documents, setDocuments] = useState<FileList | null>(null);
+  const [youtubeLinks, setYoutubeLinks] = useState<YouTubeLinkInput[]>([]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const handleAddYouTubeLink = () => {
+    setYoutubeLinks((prev) => [...prev, { url: "", title: "" }]);
+  };
+
+  const handleUpdateYouTubeLink = (index: number, field: "url" | "title", value: string) => {
+    setYoutubeLinks((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
+  const handleRemoveYouTubeLink = (index: number) => {
+    setYoutubeLinks((prev) => prev.filter((_, i) => i !== index));
+  };
 
   // ── Load dropdowns ──
   useEffect(() => {
@@ -96,6 +119,8 @@ export const AiContextAdd = () => {
     setContext("");
     setPrompt("");
     setImages(null);
+    setDocuments(null);
+    setYoutubeLinks([]);
     setError("");
     setSuccess("");
   };
@@ -128,6 +153,20 @@ export const AiContextAdd = () => {
         }
       }
 
+      if (documents && documents.length > 0) {
+        for (let i = 0; i < documents.length; i++) {
+          formData.append(`documents[${i}]`, documents[i]);
+        }
+      }
+
+      const validLinks = youtubeLinks.filter((l) => l.url.trim() !== "");
+      validLinks.forEach((link, idx) => {
+        formData.append(`youtube_links[${idx}][url]`, link.url.trim());
+        if (link.title.trim()) {
+          formData.append(`youtube_links[${idx}][title]`, link.title.trim());
+        }
+      });
+
       const res = await api.post("/admin/ai-contexts", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -137,6 +176,8 @@ export const AiContextAdd = () => {
         setContext("");
         setPrompt("");
         setImages(null);
+        setDocuments(null);
+        setYoutubeLinks([]);
         setTimeout(() => setSuccess(""), 3000);
       } else {
         setError(res.data.message || "Failed to create context.");
@@ -306,6 +347,70 @@ export const AiContextAdd = () => {
               onChange={(e) => setImages(e.target.files)}
             />
             <span className="aca__hint">Select multiple images to attach to this context.</span>
+          </div>
+
+          {/* PDF Documents */}
+          <div className="aca__group">
+            <label className="aca__label" htmlFor="aca-documents">
+              PDF Documents (Optional)
+            </label>
+            <input
+              id="aca-documents"
+              type="file"
+              multiple
+              accept=".pdf,application/pdf"
+              className="aca__input"
+              style={{ padding: '10px' }}
+              onChange={(e) => setDocuments(e.target.files)}
+            />
+            <span className="aca__hint">Select PDF brochures, catalogues, or documentation.</span>
+          </div>
+
+          {/* YouTube Links */}
+          <div className="aca__group">
+            <label className="aca__label">
+              YouTube Video Links (Optional)
+            </label>
+            <span className="aca__hint">Add YouTube videos to reference for this context.</span>
+
+            {youtubeLinks.length > 0 && (
+              <div className="aca__link-list">
+                {youtubeLinks.map((link, idx) => (
+                  <div key={idx} className="aca__link-row">
+                    <input
+                      type="url"
+                      className="aca__input"
+                      placeholder="https://www.youtube.com/watch?v=..."
+                      value={link.url}
+                      onChange={(e) => handleUpdateYouTubeLink(idx, "url", e.target.value)}
+                    />
+                    <input
+                      type="text"
+                      className="aca__input"
+                      placeholder="Title (Optional)"
+                      value={link.title}
+                      onChange={(e) => handleUpdateYouTubeLink(idx, "title", e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      className="aca__btn-icon-remove"
+                      title="Remove Link"
+                      onClick={() => handleRemoveYouTubeLink(idx)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <button
+              type="button"
+              className="aca__btn-add-link"
+              onClick={handleAddYouTubeLink}
+            >
+              + Add YouTube Link
+            </button>
           </div>
 
           {error   && <p className="aca__error">{error}</p>}
