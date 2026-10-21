@@ -1,0 +1,769 @@
+/* ==========================================================================
+   JSON WORKBENCH - STYLES
+   ========================================================================== */
+
+.jw-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background-color: #0b0f19;
+  color: #e2e8f0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow: hidden;
+}
+
+/* ── Top Bar ───────────────────────────────────────────────────────────── */
+.jw-header {
+  height: 52px;
+  background: #111827;
+  border-bottom: 1px solid #1f2937;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  flex-shrink: 0;
+  z-index: 10;
+  gap: 12px;
+}
+
+.jw-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.jw-logo-badge {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.jw-header-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #f3f4f6;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.jw-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ── Saved Dropdown Menu (Folder Organized) ────────────────────────────── */
+.jw-dropdown-wrap {
+  position: relative;
+}
+
+.jw-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 360px;
+  max-height: 480px;
+  background: #111827;
+  border: 1px solid #374151;
+  border-radius: 10px;
+  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.jw-dropdown-header {
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+  border-bottom: 1px solid #1f2937;
+  background: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.jw-dropdown-list {
+  overflow-y: auto;
+  max-height: 400px;
+  padding: 6px 0;
+}
+
+/* Folder Group in Dropdown */
+.jw-folder-group {
+  border-bottom: 1px solid #1f2937;
+}
+
+.jw-folder-group:last-child {
+  border-bottom: none;
+}
+
+.jw-folder-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #141e33;
+  cursor: pointer;
+  user-select: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: #cbd5e1;
+  transition: background 0.15s;
+}
+
+.jw-folder-header:hover {
+  background: #1e293b;
+}
+
+.jw-folder-header-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jw-folder-count {
+  font-size: 10px;
+  background: #1e293b;
+  color: #94a3b8;
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+.jw-folder-items {
+  background: #0c1220;
+}
+
+.jw-dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px 8px 24px;
+  cursor: pointer;
+  transition: background 0.15s;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.jw-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.jw-dropdown-item:hover {
+  background: #1e293b;
+}
+
+.jw-saved-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.jw-saved-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #f1f5f9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.jw-saved-meta {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.jw-saved-delete-btn {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  padding: 4px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  opacity: 0.6;
+  transition: all 0.15s;
+}
+
+.jw-saved-delete-btn:hover {
+  opacity: 1;
+  background: #7f1d1d33;
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────────── */
+.jw-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid #374151;
+  background: #1f2937;
+  color: #d1d5db;
+  transition: all 0.15s ease;
+}
+
+.jw-btn:hover {
+  background: #374151;
+  color: #ffffff;
+  border-color: #4b5563;
+}
+
+.jw-btn-primary {
+  background: #4f46e5;
+  border-color: #4338ca;
+  color: #ffffff;
+}
+
+.jw-btn-primary:hover {
+  background: #4338ca;
+  border-color: #3730a3;
+}
+
+.jw-btn-success {
+  background: #059669;
+  border-color: #047857;
+  color: #ffffff;
+}
+
+.jw-btn-success:hover {
+  background: #047857;
+  border-color: #065f46;
+}
+
+/* Mode Switcher Pills */
+.jw-mode-toggle {
+  display: inline-flex;
+  background: #090e17;
+  border: 1px solid #374151;
+  border-radius: 7px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.jw-mode-btn {
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.jw-mode-btn:hover {
+  color: #f1f5f9;
+}
+
+.jw-mode-btn--active {
+  background: #4f46e5;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.jw-type-badge {
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.jw-type-badge--json {
+  background: #312e81;
+  color: #a5b4fc;
+}
+
+.jw-type-badge--text {
+  background: #064e3b;
+  color: #6ee7b7;
+}
+
+.jw-text-preview {
+  flex: 1;
+  overflow: auto;
+  padding: 20px;
+  color: #f1f5f9;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+  user-select: text;
+}
+
+.jw-btn-danger {
+  background: #7f1d1d;
+  border-color: #991b1b;
+  color: #fecaca;
+}
+
+.jw-btn-danger:hover {
+  background: #991b1b;
+  color: #ffffff;
+}
+
+.jw-btn-active {
+  background: #312e81;
+  border-color: #6366f1;
+  color: #e0e7ff;
+}
+
+/* ── Modal for Save Title & Folder ─────────────────────────────────────── */
+.jw-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.jw-modal-box {
+  width: 90%;
+  max-width: 460px;
+  background: #111827;
+  border: 1px solid #374151;
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.jw-modal-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #f3f4f6;
+}
+
+.jw-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.jw-form-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.jw-modal-input {
+  width: 100%;
+  background: #0b1120;
+  border: 1px solid #374151;
+  border-radius: 6px;
+  padding: 9px 12px;
+  font-size: 13px;
+  color: #f1f5f9;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.jw-modal-input:focus {
+  border-color: #6366f1;
+}
+
+.jw-folder-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.jw-folder-tag {
+  background: #1f2937;
+  border: 1px solid #374151;
+  color: #cbd5e1;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.jw-folder-tag:hover,
+.jw-folder-tag--active {
+  background: #312e81;
+  border-color: #6366f1;
+  color: #e0e7ff;
+}
+
+.jw-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* ── Main Layout with Resizable Divider ─────────────────────────────────── */
+.jw-workspace {
+  display: flex;
+  flex: 1;
+  height: calc(100vh - 52px);
+  overflow: hidden;
+  position: relative;
+  user-select: none;
+}
+
+/* Left Pane */
+.jw-left-pane {
+  background: #0f172a;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Horizontal Resize Splitter Divider */
+.jw-resizer {
+  width: 8px;
+  background: #1e293b;
+  cursor: col-resize;
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.2s;
+  z-index: 20;
+}
+
+.jw-resizer:hover,
+.jw-resizer.jw-resizer--dragging {
+  background: #6366f1;
+}
+
+.jw-resizer-line {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 24px;
+  background: #64748b;
+  border-radius: 2px;
+}
+
+/* Right Pane */
+.jw-right-pane {
+  background: #090d16;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* ── Panel Header / Toolbar ────────────────────────────────────────────── */
+.jw-panel-bar {
+  height: 40px;
+  background: #131b2e;
+  border-bottom: 1px solid #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  flex-shrink: 0;
+}
+
+.jw-panel-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.jw-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── Editor Area ───────────────────────────────────────────────────────── */
+.jw-editor-wrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.jw-textarea {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  color: #f1f5f9;
+  font-family: "JetBrains Mono", "Fira Code", Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 14px;
+  border: none;
+  resize: none;
+  outline: none;
+  white-space: pre;
+  tab-size: 2;
+  overflow: auto;
+  user-select: text;
+}
+
+.jw-textarea::placeholder {
+  color: #475569;
+}
+
+.jw-status-bar {
+  height: 28px;
+  background: #0d1322;
+  border-top: 1px solid #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  font-size: 11px;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.jw-status-success {
+  color: #34d399;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.jw-status-error {
+  color: #f87171;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 85%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Right Viewer Area ─────────────────────────────────────────────────── */
+.jw-viewer-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: text;
+}
+
+.jw-search-input {
+  background: #0b1120;
+  border: 1px solid #1e293b;
+  border-radius: 5px;
+  padding: 4px 10px;
+  font-size: 11px;
+  color: #f1f5f9;
+  outline: none;
+  width: 180px;
+  transition: all 0.2s;
+}
+
+.jw-search-input:focus {
+  border-color: #6366f1;
+  width: 220px;
+}
+
+.jw-tree-scroll {
+  flex: 1;
+  overflow: auto;
+  padding: 16px 20px;
+  font-family: "JetBrains Mono", "Fira Code", Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* ── Tree View Nodes ───────────────────────────────────────────────────── */
+.jw-tree-node {
+  display: flex;
+  flex-direction: column;
+}
+
+.jw-line {
+  display: flex;
+  align-items: flex-start;
+  padding: 2px 4px;
+  border-radius: 4px;
+  min-height: 24px;
+  transition: background-color 0.1s;
+}
+
+.jw-line:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.jw-toggle-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0 4px;
+  font-size: 10px;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 20px;
+  margin-right: 2px;
+  border-radius: 3px;
+}
+
+.jw-toggle-btn:hover {
+  background: #1e293b;
+  color: #cbd5e1;
+}
+
+.jw-toggle-space {
+  display: inline-block;
+  width: 20px;
+}
+
+.jw-key {
+  color: #93c5fd;
+  font-weight: 500;
+}
+
+.jw-colon {
+  color: #64748b;
+  margin-right: 6px;
+}
+
+.jw-bracket {
+  color: #fbbf24;
+  font-weight: 600;
+}
+
+.jw-collapsed-badge {
+  background: #1e293b;
+  color: #94a3b8;
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 0 4px;
+  border: 1px dashed #334155;
+  user-select: none;
+}
+
+.jw-collapsed-badge:hover {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+.jw-children {
+  border-left: 1px dashed rgba(255, 255, 255, 0.1);
+  margin-left: 9px;
+  padding-left: 14px;
+}
+
+/* ── Value Syntaxes ────────────────────────────────────────────────────── */
+.jw-val-string {
+  color: #34d399;
+  word-break: break-all;
+}
+
+.jw-val-number {
+  color: #f59e0b;
+}
+
+.jw-val-boolean {
+  color: #f43f5e;
+  font-weight: 600;
+}
+
+.jw-val-null {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* ── Inline Editable Text Nodes ────────────────────────────────────────── */
+.jw-editable {
+  outline: none;
+  border-radius: 3px;
+  padding: 0 3px;
+  cursor: text;
+  display: inline-block;
+  min-width: 14px;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.jw-editable:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.jw-editable:focus {
+  background: #1e1b4b;
+  border-color: #818cf8;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+  color: #ffffff;
+}
+
+/* ── Raw View ──────────────────────────────────────────────────────────── */
+.jw-raw-view {
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+  margin: 0;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #cbd5e1;
+  white-space: pre;
+}
+
+/* ── Empty State ───────────────────────────────────────────────────────── */
+.jw-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #475569;
+  gap: 12px;
+}
+
+.jw-empty-icon {
+  font-size: 42px;
+  opacity: 0.5;
+}
+
+.jw-empty-text {
+  font-size: 14px;
+}

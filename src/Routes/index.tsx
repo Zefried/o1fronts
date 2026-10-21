@@ -5,6 +5,7 @@ import { Login } from "../Pages/Auth/Login";
 import { ProtectedRoute } from "./ProtectedRoutes";
 import { Unauthorized } from "../Pages/Auth/Unauthorized";
 import { DashboardHome } from "../Pages/Panels/DashboardHome";
+import { JsonView } from "../jsonWork/jsonView";
 import { categoryRoutes } from "./Admin/Category/CategoryRoutes";
 import { serviceRoutes } from "./Admin/Service/ServiceRoutes";
 import { attributeRoutes } from "./Admin/Attributes/AttributeRoutes";
@@ -29,6 +30,14 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/json",
+    element: <JsonView />,
+  },
+  {
+    path: "/json-view",
+    element: <JsonView />,
   },
   {
     path: "/unauthorized",
