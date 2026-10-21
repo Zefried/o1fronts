@@ -29,13 +29,23 @@ export const Navbar = ({
 
   const pageTitles: Record<string, string> = {
     "/dashboard": "Dashboard",
-    "/dashboard/locations": "Location",
-    "/dashboard/department": "Home",
-    "/dashboard/add-agent": "Add Agent",
-    "/dashboard/agent-profile": "Agent Profile",
-    "/dashboard/total-agents": "All Agents",
-    "/dashboard/total-workers": "All Workers",
-    "/dashboard/total-transactions": "All Transactions",
+    "/dashboard/playground": "Playground Chat",
+    "/dashboard/playground/create-campaign": "Create Campaign",
+    "/dashboard/playground/view-campaigns": "View Campaigns",
+    "/dashboard/category": "Categories",
+    "/dashboard/category/add": "Add Category",
+    "/dashboard/service": "Services",
+    "/dashboard/service/add": "Add Service",
+    "/dashboard/attributes": "Attributes",
+    "/dashboard/attributes/add": "Add Attribute",
+    "/dashboard/attribute-fields": "Attribute Fields",
+    "/dashboard/attribute-fields/add": "Add Attribute Field",
+    "/dashboard/ai-contexts": "AI Contexts",
+    "/dashboard/ai-contexts/add": "Add AI Context",
+    "/dashboard/businesses": "Businesses",
+    "/dashboard/businesses/add": "Add Business",
+    "/dashboard/lead-qualification": "Lead Qualification",
+    "/dashboard/lead-qualification/view": "View Lead Qualifications",
   };
 
   const pageTitle = pageTitles[location.pathname] || "Dashboard";

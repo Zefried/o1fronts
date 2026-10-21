@@ -1,23 +1,16 @@
 import {
   Home,
-  Users,
   Settings,
   ShoppingCart,
-  FileText,
-  UsersRound,
-  UserPlus,
   Building,
-  Layers,
   BarChart3,
   Tag,
   List,
   Plus,
   MessageSquare,
   Bot,
-  FlaskConical,
 } from "lucide-react";
-
-export type Role = "admin" | "subadmin" | "department";
+import type { Role } from "../Context/AuthContextValue";
 
 export type MenuItem = {
   name: string;
@@ -36,12 +29,6 @@ export const menus: Record<Role, MenuItem[]> = {
       name: "Dashboard",
       icon: Home,
       path: "/dashboard",
-    },
-
-    {
-      name: "TestingGPT",
-      icon: FlaskConical,
-      path: "/dashboard/testing-gpt",
     },
 
     {
@@ -174,63 +161,17 @@ export const menus: Record<Role, MenuItem[]> = {
 
   subadmin: [
     {
-      name: "Home",
+      name: "Dashboard",
       icon: Home,
-      path: "/dashboard/subadmin",
-    },
-    {
-      name: "Users",
-      icon: Users,
-      children: [
-        {
-          name: "All Users",
-          icon: Users,
-          path: "/dashboard/subadmin/users",
-        },
-      ],
-    },
-    {
-      name: "Orders",
-      icon: ShoppingCart,
-      path: "/dashboard/subadmin/orders",
+      path: "/dashboard",
     },
   ],
 
   department: [
     {
-      name: "Home",
+      name: "Dashboard",
       icon: Home,
-      path: "/dashboard/department",
-    },
-
-    {
-      name: "Add Agent",
-      icon: UserPlus,
-      path: "/dashboard/add-agent",
-    },
-
-    {
-      name: "View Agent Profile",
-      icon: UserPlus,
-      path: "/dashboard/agent-profile",
-    },
-
-    {
-      name: "All Agents",
-      icon: Users,
-      path: "/dashboard/total-agents",
-    },
-
-    {
-      name: "All Workers",
-      icon: UsersRound,
-      path: "/dashboard/total-workers",
-    },
-
-    {
-      name: "All Transactions",
-      icon: FileText,
-      path: "/dashboard/total-transactions",
+      path: "/dashboard",
     },
   ],
 };

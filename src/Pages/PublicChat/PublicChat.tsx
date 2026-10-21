@@ -7,80 +7,71 @@ import "./Styles/PublicChat.css";
 
 import { AnimatedDots } from "./AnimatedDots";
 import { MessageBubble } from "./MessageBubble";
-
-export interface ChatMessage {
-  id: string;
-  role: "user" | "assistant" | "system";
-  content: string;
-  timestamp: Date;
-}
-
-export function formatTime(date: Date): string {
-  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-}
-
-function generateId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2);
-}
+import { type ChatMessage, generateId } from "./chatTypes";
 
 const WELCOME_MESSAGE: ChatMessage = {
   id: "welcome",
   role: "assistant",
-  content: "Hello.",
+  content: "Hello! How can I help you today?",
   timestamp: new Date(),
 };
-
-
 
 export const PublicChat = () => {
   const { token } = useParams<{ token: string }>();
   const [businessId, setBusinessId] = useState<string | null>(null);
+  const [options, setOptions] = useState<string[]>([]);
+  const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
+  const [isLoadingSession, setIsLoadingSession] = useState<boolean>(true);
 
   const [messages, setMessages] = useState<ChatMessage[]>([WELCOME_MESSAGE]);
   const [input, setInput] = useState("");
   const [typingStatus, setTypingStatus] = useState<'none' | 'just_a_sec...' | 'typing'>('none');
-  const [contextState, setContextState] = useState<any>(null);
-
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Initialize session from backend using token
   useEffect(() => {
-    if (token) {
-      try {
-        const decoded = atob(token);
-        const parts = decoded.split("||");
-        const id = parts[0];
-        setBusinessId(id);
-
-
-        api.post('/public/chat/init', { token, businessId: id })
-          .then(res => {
-            if (res.data?.status && res.data?.data) {
-              const newBusinessContext = res.data.data;
-
-              setContextState((prev: any) => ({
-                ...(prev || {}),
-                businessContext: newBusinessContext
-              }));
-            }
-          })
-          .catch(err => console.error("Failed to fetch business context", err));
-
-      } catch (e) {
-        console.error("Invalid token");
-      }
+    if (!token) {
+      setIsLoadingSession(false);
+      return;
     }
+
+    setIsLoadingSession(true);
+    api.post('/public/chat/session/init', {
+      token,
+      campaign_link: window.location.href,
+    })
+      .then(res => {
+        if (res.data?.status && res.data?.data) {
+          const data = res.data.data;
+          setBusinessId(data.business_id);
+          if (Array.isArray(data.options)) {
+            setOptions(data.options);
+          }
+          if (data.business_name) {
+            setMessages([
+              {
+                id: "welcome",
+                role: "assistant",
+                content: `Hii, Welcome to ${data.business_name}`,
+                timestamp: new Date(),
+              },
+            ]);
+          }
+        }
+      })
+      .catch(err => {
+        console.error("Failed to initialize chat session", err);
+      })
+      .finally(() => {
+        setIsLoadingSession(false);
+      });
   }, [token]);
-
-
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typingStatus]);
-
-
-
 
   const handleClearChat = () => {
     setMessages([
@@ -90,16 +81,11 @@ export const PublicChat = () => {
         timestamp: new Date(),
       },
     ]);
-    setContextState((prev: any) => ({
-      businessContext: prev?.businessContext,
-      chatContext: { infoHistory: [] }
-    }));
-    inputRef.current?.focus();
+    setIsOptionSelected(false);
   };
 
-  const handleSend = useCallback(async () => {
-    const text = input.trim();
-    if (!text || typingStatus !== 'none' || !businessId) return;
+  const dispatchMessage = useCallback((text: string) => {
+    if (!text || typingStatus !== 'none') return;
 
     const userMsg: ChatMessage = {
       id: generateId(),
@@ -111,32 +97,16 @@ export const PublicChat = () => {
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setTypingStatus('just_a_sec...');
-    inputRef.current?.focus();
 
-    const timerId = setTimeout(() => {
-      setTypingStatus(prev => prev === 'just_a_sec...' ? 'typing' : prev);
-    }, 2000);
+    setTimeout(() => {
+      setTypingStatus('none');
 
-    try {
-      const res = await api.post('/public/chat', {
-        message: text,
-        chat: messages.map(m => ({ role: m.role, content: m.content })),
-        business_id: businessId,
-        campaign_link: window.location.href,
-        context_state: contextState
-      });
-      const data = res.data;
-
-      let replyContent = "Sorry, I am unable to fulfill that request right now.";
-      if (data.status && data.data?.reply) {
-        replyContent = data.data.reply;
-        if (data.data.context_state) {
-          setContextState((prev: any) => ({
-            ...(prev || {}),
-            chatContext: data.data.context_state.chatContext,
-            businessContext: prev?.businessContext
-          }));
-        }
+      let replyContent = "Thank you for reaching out! We received your message and will provide you with all the details shortly.";
+      const lower = text.toLowerCase();
+      if (lower.includes("price") || lower.includes("pricing")) {
+        replyContent = "hey something went wrong on the server, I'll try to connect you with my team, kindly share your phone number.";
+      } else if (lower.includes("portfolio")) {
+        replyContent = "Thank you for your interest in our portfolio! We take pride in delivering top-quality projects. Our team will share our featured work and design samples with you.";
       }
 
       const aiMsg: ChatMessage = {
@@ -147,22 +117,20 @@ export const PublicChat = () => {
       };
 
       setMessages((prev) => [...prev, aiMsg]);
+      inputRef.current?.focus();
+    }, 600);
+  }, [typingStatus]);
 
-    } catch (err) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: generateId(),
-          role: "assistant",
-          content: "Network error. Please try again.",
-          timestamp: new Date(),
-        },
-      ]);
-    } finally {
-      clearTimeout(timerId);
-      setTypingStatus('none');
-    }
-  }, [input, typingStatus, messages, businessId]);
+  const handleSelectOption = (optionText: string) => {
+    setIsOptionSelected(true);
+    dispatchMessage(optionText);
+  };
+
+  const handleSend = () => {
+    const text = input.trim();
+    if (!text || !isOptionSelected || typingStatus !== 'none') return;
+    dispatchMessage(text);
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -171,8 +139,20 @@ export const PublicChat = () => {
     }
   };
 
+  if (isLoadingSession) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#080808', color: '#fff' }}>
+        <AnimatedDots text="Loading chat" />
+      </div>
+    );
+  }
+
   if (!businessId) {
-    return <div style={{ padding: 40, textAlign: 'center', color: '#fff', background: '#000', height: '100vh' }}>Invalid Chat Session.</div>;
+    return (
+      <div style={{ padding: 40, textAlign: 'center', color: '#fff', background: '#080808', height: '100vh' }}>
+        Invalid or expired chat session.
+      </div>
+    );
   }
 
   return (
@@ -203,21 +183,40 @@ export const PublicChat = () => {
         </div>
 
         <div className="chat-input-container">
-          <div className="chat-input-wrapper">
+          {/* Quick-action initial options before user selects */}
+          {!isOptionSelected && options.length > 0 && (
+            <div className="chat-initial-options" id="chat-initial-options">
+              {options.map((opt, idx) => (
+                <button
+                  key={idx}
+                  id={`initial-option-${idx}`}
+                  type="button"
+                  className="option-pill-btn"
+                  onClick={() => handleSelectOption(opt)}
+                  disabled={typingStatus !== 'none'}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div className={`chat-input-wrapper ${!isOptionSelected ? 'disabled' : ''}`}>
             <input
               ref={inputRef}
               type="text"
-              placeholder="Ask anything..."
+              placeholder={isOptionSelected ? "Type your message..." : "Please select an option above to begin..."}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              disabled={typingStatus !== 'none'}
+              disabled={!isOptionSelected || typingStatus !== 'none'}
               autoComplete="off"
             />
             <button
               className="send-btn"
               onClick={handleSend}
-              disabled={!input.trim() || typingStatus !== 'none'}
+              disabled={!isOptionSelected || !input.trim() || typingStatus !== 'none'}
+              aria-label="Send message"
             >
               <Send size={18} />
             </button>

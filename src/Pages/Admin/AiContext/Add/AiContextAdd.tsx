@@ -34,11 +34,15 @@ interface YouTubeLinkInput {
   title: string;
 }
 
+interface MediaFileItem {
+  file: File;
+  title: string;
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export const AiContextAdd = () => {
   const navigate = useNavigate();
-
   const [categories, setCategories] = useState<FlatCategory[]>([]);
   const [services, setServices] = useState<ServiceOption[]>([]);
   const [attributes, setAttributes] = useState<AttributeOption[]>([]);
@@ -50,8 +54,8 @@ export const AiContextAdd = () => {
   const [attributeDefinition, setAttributeDefinition] = useState("");
   const [context, setContext] = useState("");
   const [prompt, setPrompt] = useState("");
-  const [images, setImages] = useState<FileList | null>(null);
-  const [documents, setDocuments] = useState<FileList | null>(null);
+  const [images, setImages] = useState<MediaFileItem[]>([]);
+  const [documents, setDocuments] = useState<MediaFileItem[]>([]);
   const [youtubeLinks, setYoutubeLinks] = useState<YouTubeLinkInput[]>([]);
 
   const [loading, setLoading] = useState(false);
@@ -72,6 +76,48 @@ export const AiContextAdd = () => {
 
   const handleRemoveYouTubeLink = (index: number) => {
     setYoutubeLinks((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleImagesSelect = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const newItems: MediaFileItem[] = Array.from(files).map((f) => ({
+      file: f,
+      title: f.name.replace(/\.[^/.]+$/, ""),
+    }));
+    setImages((prev) => [...prev, ...newItems]);
+  };
+
+  const handleUpdateImageTitle = (index: number, title: string) => {
+    setImages((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], title };
+      return updated;
+    });
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleDocsSelect = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const newItems: MediaFileItem[] = Array.from(files).map((f) => ({
+      file: f,
+      title: f.name.replace(/\.[^/.]+$/, ""),
+    }));
+    setDocuments((prev) => [...prev, ...newItems]);
+  };
+
+  const handleUpdateDocTitle = (index: number, title: string) => {
+    setDocuments((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], title };
+      return updated;
+    });
+  };
+
+  const handleRemoveDoc = (index: number) => {
+    setDocuments((prev) => prev.filter((_, i) => i !== index));
   };
 
   // ── Load dropdowns ──
@@ -118,8 +164,8 @@ export const AiContextAdd = () => {
     setBusinessId("");
     setContext("");
     setPrompt("");
-    setImages(null);
-    setDocuments(null);
+    setImages([]);
+    setDocuments([]);
     setYoutubeLinks([]);
     setError("");
     setSuccess("");
@@ -147,16 +193,22 @@ export const AiContextAdd = () => {
       formData.append("context", context.trim());
       formData.append("prompt", prompt.trim());
       
-      if (images && images.length > 0) {
-        for (let i = 0; i < images.length; i++) {
-          formData.append(`images[${i}]`, images[i]);
-        }
+      if (images.length > 0) {
+        images.forEach((item, i) => {
+          formData.append(`images[${i}]`, item.file);
+          if (item.title.trim()) {
+            formData.append(`images_titles[${i}]`, item.title.trim());
+          }
+        });
       }
 
-      if (documents && documents.length > 0) {
-        for (let i = 0; i < documents.length; i++) {
-          formData.append(`documents[${i}]`, documents[i]);
-        }
+      if (documents.length > 0) {
+        documents.forEach((item, i) => {
+          formData.append(`documents[${i}]`, item.file);
+          if (item.title.trim()) {
+            formData.append(`documents_titles[${i}]`, item.title.trim());
+          }
+        });
       }
 
       const validLinks = youtubeLinks.filter((l) => l.url.trim() !== "");
@@ -175,8 +227,8 @@ export const AiContextAdd = () => {
         setSuccess("✅ Context created successfully!");
         setContext("");
         setPrompt("");
-        setImages(null);
-        setDocuments(null);
+        setImages([]);
+        setDocuments([]);
         setYoutubeLinks([]);
         setTimeout(() => setSuccess(""), 3000);
       } else {
@@ -333,6 +385,7 @@ export const AiContextAdd = () => {
             <span className="aca__hint">Keep it short and include a constraint (e.g. "Do not invent…").</span>
           </div>
 
+          {/* Portfolio Images */}
           <div className="aca__group">
             <label className="aca__label" htmlFor="aca-images">
               Portfolio Images (Optional)
@@ -344,9 +397,39 @@ export const AiContextAdd = () => {
               accept="image/*"
               className="aca__input"
               style={{ padding: '10px' }}
-              onChange={(e) => setImages(e.target.files)}
+              onChange={(e) => {
+                handleImagesSelect(e.target.files);
+                e.target.value = "";
+              }}
             />
-            <span className="aca__hint">Select multiple images to attach to this context.</span>
+            <span className="aca__hint">Select images and set custom titles for each.</span>
+
+            {images.length > 0 && (
+              <div className="aca__link-list" style={{ marginTop: "10px" }}>
+                {images.map((item, idx) => (
+                  <div key={idx} className="aca__link-row">
+                    <span style={{ fontSize: "12px", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} title={item.file.name}>
+                      🖼️ {item.file.name}
+                    </span>
+                    <input
+                      type="text"
+                      className="aca__input"
+                      placeholder="Image Title"
+                      value={item.title}
+                      onChange={(e) => handleUpdateImageTitle(idx, e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      className="aca__btn-icon-remove"
+                      title="Remove Image"
+                      onClick={() => handleRemoveImage(idx)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* PDF Documents */}
@@ -361,9 +444,39 @@ export const AiContextAdd = () => {
               accept=".pdf,application/pdf"
               className="aca__input"
               style={{ padding: '10px' }}
-              onChange={(e) => setDocuments(e.target.files)}
+              onChange={(e) => {
+                handleDocsSelect(e.target.files);
+                e.target.value = "";
+              }}
             />
-            <span className="aca__hint">Select PDF brochures, catalogues, or documentation.</span>
+            <span className="aca__hint">Select PDF brochures or catalogues and set custom titles.</span>
+
+            {documents.length > 0 && (
+              <div className="aca__link-list" style={{ marginTop: "10px" }}>
+                {documents.map((item, idx) => (
+                  <div key={idx} className="aca__link-row">
+                    <span style={{ fontSize: "12px", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} title={item.file.name}>
+                      📄 {item.file.name}
+                    </span>
+                    <input
+                      type="text"
+                      className="aca__input"
+                      placeholder="Document Title"
+                      value={item.title}
+                      onChange={(e) => handleUpdateDocTitle(idx, e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      className="aca__btn-icon-remove"
+                      title="Remove Document"
+                      onClick={() => handleRemoveDoc(idx)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* YouTube Links */}

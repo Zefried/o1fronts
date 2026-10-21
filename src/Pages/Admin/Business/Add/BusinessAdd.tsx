@@ -46,7 +46,7 @@ export const BusinessAdd = () => {
     fetchCategories();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError("");
   };
@@ -185,7 +185,7 @@ export const BusinessAdd = () => {
               name="category_id"
               className="biz-add__input"
               value={formData.category_id}
-              onChange={handleChange as any}
+              onChange={handleChange}
               required
             >
               <option value="">Select a Category/Subcategory</option>
@@ -207,7 +207,7 @@ export const BusinessAdd = () => {
               name="role"
               className="biz-add__input"
               value={formData.role}
-              onChange={handleChange as any}
+              onChange={handleChange}
               required
             >
               <option value="business">Business</option>

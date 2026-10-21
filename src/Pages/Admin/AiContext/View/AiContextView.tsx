@@ -25,6 +25,7 @@ interface ImageItem {
   id: number;
   image_url: string;
   image_name: string;
+  title?: string | null;
   is_primary?: boolean;
 }
 
@@ -697,6 +698,12 @@ const MediaHubModal = ({
   const [newYtUrl, setNewYtUrl] = useState("");
   const [newYtTitle, setNewYtTitle] = useState("");
 
+  const [editingImgId, setEditingImgId] = useState<number | null>(null);
+  const [editImgTitle, setEditImgTitle] = useState("");
+
+  const [editingDocId, setEditingDocId] = useState<number | null>(null);
+  const [editDocTitle, setEditDocTitle] = useState("");
+
   const images = record.images || [];
   const pdfs = (record.attachments || []).filter((a) => a.type === "pdf");
   const youtubes = (record.attachments || []).filter((a) => a.type === "youtube");
@@ -846,6 +853,42 @@ const MediaHubModal = ({
     }
   };
 
+  const handleSaveEditImg = async (imageId: number) => {
+    if (!editImgTitle.trim()) return;
+    try {
+      const res = await api.put(`/admin/images/${imageId}`, {
+        title: editImgTitle.trim(),
+      });
+      if (res.data.status) {
+        addToast("success", "✅ Image title updated!");
+        setEditingImgId(null);
+        onRefresh();
+      } else {
+        addToast("error", res.data.message || "Failed to update image title.");
+      }
+    } catch {
+      addToast("error", "Failed to update image title.");
+    }
+  };
+
+  const handleSaveEditDoc = async (attachmentId: number) => {
+    if (!editDocTitle.trim()) return;
+    try {
+      const res = await api.put(`/admin/attachments/${attachmentId}`, {
+        title: editDocTitle.trim(),
+      });
+      if (res.data.status) {
+        addToast("success", "✅ Document title updated!");
+        setEditingDocId(null);
+        onRefresh();
+      } else {
+        addToast("error", res.data.message || "Failed to update document title.");
+      }
+    } catch {
+      addToast("error", "Failed to update document title.");
+    }
+  };
+
   const handleSaveEditYt = async (attachmentId: number) => {
     if (!editYtUrl.trim()) return;
     try {
@@ -931,24 +974,74 @@ const MediaHubModal = ({
                 <div className="acv-img-grid">
                   {images.map((img) => {
                     const imgUrl = `http://127.0.0.1:8000/storage/${img.image_url}`;
+                    const isEditing = editingImgId === img.id;
+                    const displayTitle = img.title || img.image_name;
+
                     return (
                       <div key={img.id} className="acv-img-card">
                         <div
                           className="acv-img-thumb-wrap"
-                          onClick={() => onViewImage(imgUrl, img.image_name)}
+                          onClick={() => onViewImage(imgUrl, displayTitle)}
                           title="Click to zoom preview"
                         >
-                          <img src={imgUrl} alt={img.image_name} className="acv-img-thumb" />
+                          <img src={imgUrl} alt={displayTitle} className="acv-img-thumb" />
                         </div>
                         <div className="acv-img-card-info">
-                          <span className="acv-img-card-name" title={img.image_name}>
-                            {img.image_name}
-                          </span>
+                          {isEditing ? (
+                            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                              <input
+                                type="text"
+                                className="acv-form__input"
+                                style={{ padding: "4px 8px", fontSize: "12px", width: "100%" }}
+                                placeholder="Image title"
+                                value={editImgTitle}
+                                onChange={(e) => setEditImgTitle(e.target.value)}
+                              />
+                              <div style={{ display: "flex", gap: "4px" }}>
+                                <button
+                                  className="acv-btn acv-btn--primary"
+                                  style={{ padding: "2px 8px", fontSize: "11px" }}
+                                  onClick={() => handleSaveEditImg(img.id)}
+                                >
+                                  Save
+                                </button>
+                                <button
+                                  className="acv-btn acv-btn--ghost"
+                                  style={{ padding: "2px 8px", fontSize: "11px" }}
+                                  onClick={() => setEditingImgId(null)}
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                              <span className="acv-img-card-name" style={{ fontWeight: 600 }} title={displayTitle}>
+                                {displayTitle}
+                              </span>
+                              {img.title && img.title !== img.image_name && (
+                                <span style={{ fontSize: "10px", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} title={img.image_name}>
+                                  {img.image_name}
+                                </span>
+                              )}
+                            </div>
+                          )}
+
                           <div className="acv-card-actions">
                             <button
                               className="acv-card-btn"
+                              title="Edit Title"
+                              onClick={() => {
+                                setEditingImgId(img.id);
+                                setEditImgTitle(img.title || img.image_name);
+                              }}
+                            >
+                              ✏️
+                            </button>
+                            <button
+                              className="acv-card-btn"
                               title="Zoom Preview"
-                              onClick={() => onViewImage(imgUrl, img.image_name)}
+                              onClick={() => onViewImage(imgUrl, displayTitle)}
                             >
                               👁️
                             </button>
@@ -1021,15 +1114,51 @@ const MediaHubModal = ({
                 <div className="acv-doc-list">
                   {pdfs.map((doc) => {
                     const docUrl = `http://127.0.0.1:8000/storage/${doc.url}`;
-                    const docName = doc.file_name || doc.title || "document.pdf";
+                    const isEditing = editingDocId === doc.id;
+                    const displayTitle = doc.title || doc.file_name || "document.pdf";
+
                     return (
                       <div key={doc.id} className="acv-doc-item">
-                        <div className="acv-doc-left">
+                        <div className="acv-doc-left" style={{ flex: 1 }}>
                           <span className="acv-doc-icon">📄</span>
-                          <div className="acv-doc-details">
-                            <span className="acv-doc-title" title={docName}>
-                              {docName}
-                            </span>
+                          <div className="acv-doc-details" style={{ width: "100%" }}>
+                            {isEditing ? (
+                              <div style={{ display: "flex", gap: "6px", alignItems: "center", marginBottom: "4px" }}>
+                                <input
+                                  type="text"
+                                  className="acv-form__input"
+                                  style={{ padding: "4px 8px", fontSize: "12px", flex: 1 }}
+                                  placeholder="Document title"
+                                  value={editDocTitle}
+                                  onChange={(e) => setEditDocTitle(e.target.value)}
+                                />
+                                <button
+                                  className="acv-btn acv-btn--primary"
+                                  style={{ padding: "3px 8px", fontSize: "11px" }}
+                                  onClick={() => handleSaveEditDoc(doc.id)}
+                                >
+                                  Save
+                                </button>
+                                <button
+                                  className="acv-btn acv-btn--ghost"
+                                  style={{ padding: "3px 8px", fontSize: "11px" }}
+                                  onClick={() => setEditingDocId(null)}
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            ) : (
+                              <>
+                                <span className="acv-doc-title" style={{ fontWeight: 600 }} title={displayTitle}>
+                                  {displayTitle}
+                                </span>
+                                {doc.title && doc.file_name && doc.title !== doc.file_name && (
+                                  <span style={{ fontSize: "11px", color: "#64748b" }}>
+                                    File: {doc.file_name}
+                                  </span>
+                                )}
+                              </>
+                            )}
                             <div className="acv-doc-meta">
                               {doc.file_size && <span>{formatFileSize(doc.file_size)}</span>}
                               <span>PDF Document</span>
@@ -1040,15 +1169,25 @@ const MediaHubModal = ({
                         <div className="acv-card-actions">
                           <button
                             className="acv-card-btn"
+                            title="Edit Title"
+                            onClick={() => {
+                              setEditingDocId(doc.id);
+                              setEditDocTitle(doc.title || doc.file_name || "");
+                            }}
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            className="acv-card-btn"
                             title="View PDF"
-                            onClick={() => onViewPdf(docUrl, docName)}
+                            onClick={() => onViewPdf(docUrl, displayTitle)}
                           >
                             👁️
                           </button>
                           <button
                             className="acv-card-btn"
                             title="Download PDF"
-                            onClick={() => downloadFile(docUrl, docName)}
+                            onClick={() => downloadFile(docUrl, doc.file_name || displayTitle)}
                           >
                             ⬇️
                           </button>

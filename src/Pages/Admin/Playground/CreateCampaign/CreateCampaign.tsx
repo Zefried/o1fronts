@@ -47,9 +47,9 @@ export const CreateCampaign = () => {
         try {
           const svcRes = await api.get(`/admin/services?business_id=${businessId.trim()}`);
           if (svcRes.data.status) {
-            setServices(svcRes.data.data.filter((s: any) => s.status === 'active'));
+            setServices(svcRes.data.data.filter((s: { status: string; id: number; name: string }) => s.status === 'active'));
           }
-        } catch (e) {
+        } catch {
           console.error("Failed to load services");
         }
 
@@ -62,7 +62,7 @@ export const CreateCampaign = () => {
       } else {
         setError(data.message || 'Business not found.');
       }
-    } catch (err) {
+    } catch {
       setError("An error occurred while checking the business.");
     } finally {
       setLoading(false);
@@ -80,7 +80,7 @@ export const CreateCampaign = () => {
     }
     
     try {
-      const payload: any = {
+      const payload: Record<string, unknown> = {
         business_id: businessId.trim(),
         campaign_name: campaignName.trim(),
         gender: gender,

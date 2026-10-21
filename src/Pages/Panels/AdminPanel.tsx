@@ -69,9 +69,9 @@ const AdminPanel = () => {
 
           <h4
             className="adp-view-all-link"
-            onClick={() => navigate('/dashboard/restaurants')}
+            onClick={() => navigate('/dashboard/businesses')}
           >
-            View All Restaurants →
+            View All Businesses →
           </h4>
         </div>
 

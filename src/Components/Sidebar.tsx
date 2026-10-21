@@ -1,6 +1,7 @@
 import { ChevronDown } from "lucide-react";
 import "./Style/Sidebar.css";
 import { useNavigate, useLocation } from "react-router-dom";
+import logo from "../assets/logo/dash.png";
 
 type MenuItem = {
   name: string;
@@ -39,13 +40,13 @@ export const Sidebar = ({
       <div className="sidebar-brand">
         <div className="brand-logo">
           <img
-            src="https://www.shutterstock.com/image-vector/speedo-meter-logo-vector-illustration-600nw-2688888335.jpg"
-            alt="Fixo Logo"
+            src={logo}
+            alt="Logo"
           />
         </div>
 
         {sidebarOpen && (
-          <span className="brand-name">Restro Dashboard</span>
+          <span className="brand-name">Dashboard</span>
         )}
       </div>
 

@@ -6,7 +6,6 @@ import {
   Plus,
   Mail,
   Phone,
-  CalendarDays,
   Edit2,
   X,
   FileText,

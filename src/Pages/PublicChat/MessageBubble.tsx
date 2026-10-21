@@ -1,5 +1,5 @@
 import React from "react";
-import { formatTime, type ChatMessage } from "./PublicChat";
+import { formatTime, type ChatMessage } from "./chatTypes";
 
 export const MessageBubble = ({ msg }: { msg: ChatMessage }) => {
   const isUser = msg.role === "user";

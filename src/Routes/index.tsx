@@ -5,8 +5,6 @@ import { Login } from "../Pages/Auth/Login";
 import { ProtectedRoute } from "./ProtectedRoutes";
 import { Unauthorized } from "../Pages/Auth/Unauthorized";
 import { DashboardHome } from "../Pages/Panels/DashboardHome";
-import { adminRoutes } from "./Admin/route";
-import { testRoutes } from "./Test/TestRoutes";
 import { categoryRoutes } from "./Admin/Category/CategoryRoutes";
 import { serviceRoutes } from "./Admin/Service/ServiceRoutes";
 import { attributeRoutes } from "./Admin/Attributes/AttributeRoutes";
@@ -14,7 +12,6 @@ import { aiContextRoutes } from "./Admin/AiContext/AiContextRoutes";
 import { playgroundRoutes } from "./Admin/Playground/PlaygroundRoutes";
 import { businessRoutes } from "./Admin/Business/BusinessRoutes";
 import { leadQualificationRoutes } from "./Admin/LeadQualification/LeadQualificationRoutes";
-import { TestingGPT } from "../Pages/TestingGPT/TestingGPT";
 
 const router = createBrowserRouter([
   {
@@ -22,7 +19,11 @@ const router = createBrowserRouter([
     element: <Navigate to="/login" replace />,
   },
   {
-    path: "/chat/:token",
+    path: "/chat/:token?",
+    element: <PublicChat />,
+  },
+  {
+    path: "/chat",
     element: <PublicChat />,
   },
   {
@@ -47,8 +48,6 @@ const router = createBrowserRouter([
       },
       
       // plug modular routes
-      ...adminRoutes,
-      ...testRoutes,
       ...categoryRoutes,
       ...serviceRoutes,
       ...attributeRoutes,
@@ -56,11 +55,11 @@ const router = createBrowserRouter([
       ...playgroundRoutes,
       ...businessRoutes,
       ...leadQualificationRoutes,
-      {
-        path: "testing-gpt",
-        element: <TestingGPT />,
-      },
     ],
+  },
+  {
+    path: "*",
+    element: <Navigate to="/login" replace />,
   },
 ]);
 

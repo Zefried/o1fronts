@@ -1,3 +1,5 @@
+import api from "./axios";
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type MessageRole = "user" | "assistant";
@@ -18,10 +20,6 @@ export interface ChatContext {
   contextText?: string;  // raw key:value from DB
   promptText?: string;   // prompt instruction from DB
 }
-
-const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
-
-import api from "./axios";
 
 // ─── sendMessage ─────────────────────────────────────────────────────────────
 // Calls the backend ChatController
@@ -53,7 +51,7 @@ export async function sendMessage(
         else if (parsed.response) content = parsed.response;
         else if (parsed.message) content = parsed.message;
         else if (Object.keys(parsed).length === 1) content = Object.values(parsed)[0];
-      } catch (e) {
+      } catch {
         // Not JSON, just use raw text
       }
       
@@ -70,7 +68,7 @@ export async function sendMessage(
     }
 
     return "Error: " + (res.data.message || "Failed to process chat");
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Chat error:", err);
     return "Network error communicating with the chat server.";
   }

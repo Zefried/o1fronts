@@ -157,6 +157,53 @@
   cursor: not-allowed;
 }
 
+/* Initial Options */
+.chat-initial-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+  animation: fadeIn 0.3s ease;
+}
+
+.option-pill-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #f0f0f0;
+  border-radius: 20px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.option-pill-btn:hover:not(:disabled) {
+  background: rgba(240, 45, 58, 0.15);
+  border-color: #f02d3a;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(240, 45, 58, 0.25);
+}
+
+.option-pill-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.chat-input-wrapper.disabled {
+  background-color: #0d0d0d;
+  border-color: #1e1e1e;
+  cursor: not-allowed;
+}
+
+.chat-input-wrapper input:disabled {
+  cursor: not-allowed;
+  color: #555;
+}
+
 /* Scrollbar customization */
 ::-webkit-scrollbar {
   width: 8px;
