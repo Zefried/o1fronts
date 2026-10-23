@@ -32,20 +32,17 @@ export const Navbar = ({
     "/dashboard/playground": "Playground Chat",
     "/dashboard/playground/create-campaign": "Create Campaign",
     "/dashboard/playground/view-campaigns": "View Campaigns",
-    "/dashboard/category": "Categories",
-    "/dashboard/category/add": "Add Category",
     "/dashboard/service": "Services",
     "/dashboard/service/add": "Add Service",
-    "/dashboard/attributes": "Attributes",
-    "/dashboard/attributes/add": "Add Attribute",
-    "/dashboard/attribute-fields": "Attribute Fields",
-    "/dashboard/attribute-fields/add": "Add Attribute Field",
     "/dashboard/ai-contexts": "AI Contexts",
     "/dashboard/ai-contexts/add": "Add AI Context",
     "/dashboard/businesses": "Businesses",
     "/dashboard/businesses/add": "Add Business",
     "/dashboard/lead-qualification": "Lead Qualification",
     "/dashboard/lead-qualification/view": "View Lead Qualifications",
+    "/dashboard/catalogue": "Catalogue Explorer & Studio",
+    "/dashboard/catalogue/niches": "Manage Niches",
+    "/dashboard/catalogue/search": "Specification Search",
   };
 
   const pageTitle = pageTitles[location.pathname] || "Dashboard";

@@ -6,13 +6,12 @@ import { ProtectedRoute } from "./ProtectedRoutes";
 import { Unauthorized } from "../Pages/Auth/Unauthorized";
 import { DashboardHome } from "../Pages/Panels/DashboardHome";
 import { JsonView } from "../jsonWork/jsonView";
-import { categoryRoutes } from "./Admin/Category/CategoryRoutes";
 import { serviceRoutes } from "./Admin/Service/ServiceRoutes";
-import { attributeRoutes } from "./Admin/Attributes/AttributeRoutes";
 import { aiContextRoutes } from "./Admin/AiContext/AiContextRoutes";
 import { playgroundRoutes } from "./Admin/Playground/PlaygroundRoutes";
 import { businessRoutes } from "./Admin/Business/BusinessRoutes";
 import { leadQualificationRoutes } from "./Admin/LeadQualification/LeadQualificationRoutes";
+import { catalogueRoutes } from "./Admin/Catalogue/CatalogueRoutes";
 
 const router = createBrowserRouter([
   {
@@ -57,13 +56,12 @@ const router = createBrowserRouter([
       },
       
       // plug modular routes
-      ...categoryRoutes,
       ...serviceRoutes,
-      ...attributeRoutes,
       ...aiContextRoutes,
       ...playgroundRoutes,
       ...businessRoutes,
       ...leadQualificationRoutes,
+      ...catalogueRoutes,
     ],
   },
   {

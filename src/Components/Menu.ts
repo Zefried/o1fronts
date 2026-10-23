@@ -3,12 +3,13 @@ import {
   Settings,
   ShoppingCart,
   Building,
-  BarChart3,
-  Tag,
   List,
   Plus,
   MessageSquare,
   Bot,
+  FolderTree,
+  Layers,
+  Search,
 } from "lucide-react";
 import type { Role } from "../Context/AuthContextValue";
 
@@ -54,23 +55,6 @@ export const menus: Record<Role, MenuItem[]> = {
     },
 
     {
-      name: "Category",
-      icon: Tag,
-      children: [
-        {
-          name: "View Categories",
-          icon: List,
-          path: "/dashboard/category",
-        },
-        {
-          name: "Add Category",
-          icon: Plus,
-          path: "/dashboard/category/add",
-        },
-      ],
-    },
-
-    {
       name: "Services",
       icon: ShoppingCart,
       children: [
@@ -83,33 +67,6 @@ export const menus: Record<Role, MenuItem[]> = {
           name: "Add Service",
           icon: Plus,
           path: "/dashboard/service/add",
-        },
-      ],
-    },
-
-    {
-      name: "Attributes",
-      icon: BarChart3,
-      children: [
-        {
-          name: "View Attributes",
-          icon: List,
-          path: "/dashboard/attributes",
-        },
-        {
-          name: "Add Attribute",
-          icon: Plus,
-          path: "/dashboard/attributes/add",
-        },
-        {
-          name: "View Fields",
-          icon: List,
-          path: "/dashboard/attribute-fields",
-        },
-        {
-          name: "Add Field",
-          icon: Plus,
-          path: "/dashboard/attribute-fields/add",
         },
       ],
     },
@@ -154,6 +111,28 @@ export const menus: Record<Role, MenuItem[]> = {
           name: "View Qualifications",
           icon: List,
           path: "/dashboard/lead-qualification/view",
+        },
+      ],
+    },
+
+    {
+      name: "Catalogue",
+      icon: FolderTree,
+      children: [
+        {
+          name: "Explorer & Studio",
+          icon: FolderTree,
+          path: "/dashboard/catalogue",
+        },
+        {
+          name: "Manage Niches",
+          icon: Layers,
+          path: "/dashboard/catalogue/niches",
+        },
+        {
+          name: "Spec Search",
+          icon: Search,
+          path: "/dashboard/catalogue/search",
         },
       ],
     },
